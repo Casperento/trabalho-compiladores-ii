@@ -4,7 +4,7 @@ Hands-on work for the Compilers II class. The main objective is the implementati
 
 # Dependencies
 
-> TODO
+- JDK 17
 
 # Build Instructions
 

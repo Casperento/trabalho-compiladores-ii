@@ -1,0 +1,1 @@
+//package Translate;package visitor;import Temp.Label;import Tree.Exp1;public class Nx extends Exp {    Tree.Stm stm;    Nx(Tree.Stm s) { stm = s; }    Exp1 unEx() { return null; }    Tree.Stm unNx() { return stm; }    Tree.Stm unCx(Label t, Label f) { return null; }}

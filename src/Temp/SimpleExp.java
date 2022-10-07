@@ -5,5 +5,5 @@ package Temp;
  */
 
 public abstract class SimpleExp  {
-       
-} 
+
+}

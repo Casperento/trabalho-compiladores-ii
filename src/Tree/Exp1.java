@@ -4,13 +4,11 @@ import Temp.Temp;
 
 import java.util.LinkedList;
 
-abstract public class Exp1 {
-    // abstract public ExpList kids();
-    // abstract public Exp build(ExpList kids);
+abstract public class Exp1 extends Stm {
+    public Object exp;
 
     abstract public LinkedList<Exp1> kids();
-
-    abstract public Exp1 build(LinkedList<Exp1> kids);
+    abstract public Exp1 build(ExpList kids);
 
     abstract public void accept(IntVisitor v, int d);
 

@@ -1,0 +1,1 @@
+package syntaxtree;import visitor.Visitor;import visitor.TypeVisitor;public class False extends Exp {    public void accept(Visitor v) {        v.visit(this);    }    public String accept(TypeVisitor v) {        return String.valueOf(v.visit(this));    }}

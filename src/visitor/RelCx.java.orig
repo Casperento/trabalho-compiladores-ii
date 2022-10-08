@@ -1,1 +1,0 @@
-//package Translate;package visitor;import Temp.Label;import Tree.Exp1;public class RelCx extends Cx {    int op;    Exp1 left, right;    RelCx(int o, Exp1 l, Exp1 r) {	op = o;	left = l;	right = r;    }    Tree.Stm unCx(Label t, Label f) {	return new Tree.CJUMP(op, left, right, t, f);    }}

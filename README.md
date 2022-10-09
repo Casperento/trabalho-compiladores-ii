@@ -12,7 +12,7 @@ Hands-on work for the Compilers II class. The main objective is the implementati
 
 To build and test the MiniJava compiler you need to execute the following commands:
 
-1. ```$ make```
+1. ```$ make --directory src```
 2. ```$ java -cp src:src/Parser Main```
 
 (Obs: project built and tested on linux only)

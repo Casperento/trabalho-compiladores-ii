@@ -1,54 +1,22 @@
 package Temp;
 
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.function.Consumer;
-import java.util.function.IntFunction;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import java.util.stream.Stream;
+import java.util.List;
+import java.util.ArrayList;
 
-public class LabelList extends LinkedList<Label> {
-    public Label head;
-    public LabelList tail;
-    public LabelList(Label h, LabelList t) {
-        head=h;
-        tail=t;
-    }
+public class LabelList {
+   public Label head;
+   public LabelList tail;
+   public LabelList(Label h, LabelList t) {head=h; tail=t;}
+   public static List<Label> listLabelToList(LabelList labelList) {
+      return listLabelToList(new ArrayList<Label>(), labelList);
+   }
 
-    @Override
-    public void replaceAll(UnaryOperator<Label> operator) {
-        super.replaceAll(operator);
-    }
-
-    @Override
-    public void sort(Comparator<? super Label> c) {
-        super.sort(c);
-    }
-
-    @Override
-    public <T> T[] toArray(IntFunction<T[]> generator) {
-        return super.toArray(generator);
-    }
-
-    @Override
-    public boolean removeIf(Predicate<? super Label> filter) {
-        return super.removeIf(filter);
-    }
-
-    @Override
-    public Stream<Label> stream() {
-        return super.stream();
-    }
-
-    @Override
-    public Stream<Label> parallelStream() {
-        return super.parallelStream();
-    }
-
-    @Override
-    public void forEach(Consumer<? super Label> action) {
-        super.forEach(action);
-    }
+   private static List<Label> listLabelToList(List<Label> list, LabelList labelList) {
+      if (labelList == null || labelList.head == null) {
+         return list;
+      }
+      list.add(labelList.head);
+      return listLabelToList(list, labelList.tail);
+   }
 }
 

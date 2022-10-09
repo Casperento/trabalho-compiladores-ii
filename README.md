@@ -6,7 +6,6 @@ Hands-on work for the Compilers II class. The main objective is the implementati
 
 - JDK 17
 - javacc (found inside **lib** folder)
-- jtb (found inside **lib** folder)
 
 # Build Instructions
 

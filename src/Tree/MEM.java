@@ -1,1 +1,16 @@
-package Tree;import Temp.Temp;public class MEM extends Exp {    public Exp exp;    public MEM(Exp e) { exp=e; }    public ExpList kids() {        return new ExpList(exp, null);    }    public Exp build(ExpList kids) {        return new MEM(kids.head);    }    public void accept(IntVisitor v, int d) { v.visit(this, d); }    public Temp accept(CodeVisitor v) { return v.visit(this); }    public <R> R accept(ResultVisitor<R> v) { return v.visit(this); }}
+package Tree;
+
+import Temp.Temp;
+public class MEM extends Exp {
+    public Exp exp;
+    public MEM(Exp e) { exp=e; }
+    public ExpList kids() {
+        return new ExpList(exp, null);
+    }
+    public Exp build(ExpList kids) {
+        return new MEM(kids.head);
+    }
+    public void accept(IntVisitor v, int d) { v.visit(this, d); }
+    public Temp accept(CodeVisitor v) { return v.visit(this); }
+    public <R> R accept(ResultVisitor<R> v) { return v.visit(this); }
+}

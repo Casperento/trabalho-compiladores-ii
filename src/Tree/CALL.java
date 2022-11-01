@@ -1,1 +1,17 @@
-package Tree;import Temp.Temp;public class CALL extends Exp {    public Exp func;    public ExpList args;    public CALL(Exp f, ExpList a) { func=f; args=a; }    public ExpList kids() {        return new ExpList(func, args);    }    public Exp build(ExpList kids) {	    return new CALL(kids.head, kids.tail);    }    public void accept(IntVisitor v, int d) { v.visit(this, d); }    public Temp accept(CodeVisitor v) { return v.visit(this); }    public <R> R accept(ResultVisitor<R> v) { return v.visit(this); }}
+package Tree;
+
+import Temp.Temp;
+public class CALL extends Exp {
+    public Exp func;
+    public ExpList args;
+    public CALL(Exp f, ExpList a) { func=f; args=a; }
+    public ExpList kids() {
+        return new ExpList(func, args);
+    }
+    public Exp build(ExpList kids) {
+	    return new CALL(kids.head, kids.tail);
+    }
+    public void accept(IntVisitor v, int d) { v.visit(this, d); }
+    public Temp accept(CodeVisitor v) { return v.visit(this); }
+    public <R> R accept(ResultVisitor<R> v) { return v.visit(this); }
+}

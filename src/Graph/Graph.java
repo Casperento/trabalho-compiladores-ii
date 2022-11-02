@@ -12,7 +12,7 @@ package Graph;
 
 public class Graph {
 
-    int nodecount=0;
+    protected int nodecount = 0;
     NodeList mynodes, mylast;
     public NodeList nodes() {
         return mynodes;

@@ -24,22 +24,28 @@ import Graph.Node;
  * @see AssemFlowGraph
  */
 
-public abstract class FlowGraph extends Graph.Graph {
+public class FlowGraph extends Graph.Graph {
     /**
      * The set of temporaries defined by this instruction or block
      */
-    public abstract TempList def(Node node);
+    public TempList def(Node node) {
+        return null;
+    }
 
     /**
      * The set of temporaries used by this instruction or block
      */
-    public abstract TempList use(Node node);
+    public TempList use(Node node) {
+        return null;
+    }
 
     /**
      * True if this node represents a <strong>move</strong> instruction,
      * i.e. one that can be deleted if def=use.
      */
-    public abstract boolean isMove(Node node);
+    public boolean isMove(Node node) {
+        return false;
+    }
 
     /**
      * Print a human-readable dump for debugging.

@@ -67,6 +67,7 @@ public class Main {
         Tree.StmList traced = (new Canon.TraceSchedule(b)).stms;
         prStmList(traced);
         Assem.InstrList instrs= codegen(f.frame,traced);
+        // TODO: Graph Coloring
         debug.println("# Instructions: ");
         for(Assem.InstrList p=instrs; p!=null; p=p.tail){
             debug.print(p.head.format(tempmap) + '\n');

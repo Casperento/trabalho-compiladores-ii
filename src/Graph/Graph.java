@@ -12,8 +12,8 @@ package Graph;
 
 public class Graph {
 
-    int nodecount=0;
-    NodeList mynodes, mylast;
+    protected int nodecount=0;
+    protected NodeList mynodes, mylast;
     public NodeList nodes() {
         return mynodes;
     }

@@ -11,12 +11,67 @@
 package RegAlloc;
 import Graph.Node;
 import Graph.Graph;
+import Graph.NodeList;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Stack;
 
 public class InterferenceGraph extends Graph {
-    public Node tnode(Temp.Temp temp);
-    public Temp.Temp gtemp(Node node);
-    public MoveList moves();
+
+    private LinkedList<NodeList> adjList;
+    private LinkedList<Node> simplifyWorklist;
+    private LinkedList<Node> worklistMoves;
+    private LinkedList<Node> freezeWorklist;
+    private LinkedList<Node> spillWorklist;
+    private LinkedList<Node> preColored;
+    private LinkedList<Node> initial;
+    private LinkedList<Node> spilledNodes;
+    private LinkedList<Node> coalescedNodes;
+    private LinkedList<Node> coloredNodes;
+    private Stack<Node> selectStack;
+
+    public InterferenceGraph() {
+        preColored = new LinkedList<Node>();
+        initial = new LinkedList<Node>();
+        simplifyWorklist = new LinkedList<Node>();
+        selectStack = new Stack<Node>();
+        worklistMoves = new LinkedList<Node>();
+        freezeWorklist = new LinkedList<Node>();
+        spillWorklist = new LinkedList<Node>();
+        spilledNodes = new LinkedList<Node>();
+        coalescedNodes = new LinkedList<Node>();
+        coloredNodes = new LinkedList<Node>();
+    }
+
+    public Node tnode(Temp.Temp temp){
+        return null;
+    }
+    
+    public Temp.Temp gtemp(Node node){
+        return null;
+    }
+
+    public MoveList moves() {
+        return null;
+    }
+
     public int spillCost(Node node) {
         return 1;
     }
+
+
+    private NodeList GetAllAdjacentNodesFrom(int n) {
+        return adjList.get(n).tail;
+    }
+
+    private void initAdjList() {
+        for(NodeList p=nodes(); p!=null; p=p.tail) {
+            Node n = p.head;
+            NodeList list = new NodeList(n, n.adj());
+            adjList.add(list);
+        }
+    }
+    
 }

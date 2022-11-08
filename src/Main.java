@@ -9,11 +9,11 @@
 // pelo professor ou copiadas das bibliotecas ou do livro Modern Compiler Implementation, foram desenvolvidas por mim. Declaro também que
 // sou (somos) o(s) responsável (éis) por todas as eventuais cópias deste programa e que não distribui (mos) nem facilitei (amos) a distribuição de cópias.
 
-import Assem.AssemFlowGraph;
 import Assem.InstrList;
 import Mips.MipsFrame;
 import Parser.MiniJavaParser;
 import Parser.ParseException;
+import RegAlloc.RegAlloc;
 import Tree.Stm;
 import syntaxtree.Node;
 import types.MJClasses;
@@ -68,12 +68,11 @@ public class Main {
         debug.println("# Trace Scheduled: ");
         Tree.StmList traced = (new Canon.TraceSchedule(b)).stms;
         prStmList(traced);
+
         Assem.InstrList instrs= codegen(f.frame,traced);
 
         // Register allocation by graph coloring
-        AssemFlowGraph flowgraph = new AssemFlowGraph(instrs);
-        debug.println("# Flowgraph: ");
-        flowgraph.show(out);
+        RegAlloc allocator = new RegAlloc(f.frame, instrs);
 
         debug.println("# Instructions: ");
         for(Assem.InstrList p=instrs; p!=null; p=p.tail){

@@ -2,6 +2,7 @@ package Assem;
 
 import FlowGraph.FlowGraph;
 import Graph.Node;
+import Graph.NodeList;
 import Temp.Label;
 import Temp.Temp;
 import Temp.TempList;
@@ -20,12 +21,17 @@ public class AssemFlowGraph extends FlowGraph {
 
     public AssemFlowGraph(InstrList instrs) {
         Instr instr, jmpInstr = null;
-        Node newNode;
+        Node node;
         for (InstrList p = instrs; p != null; p = p.tail) {
             instr = p.head;
-            newNode = this.newNode();
-            tableNodeInstr.put(newNode, instr);
-            tableInstrNode.put(instr, newNode);
+            node = this.newNode();
+            tableNodeInstr.put(node, instr);
+            tableInstrNode.put(instr, node);
+        }
+        for (NodeList nodes = this.nodes(); nodes != null; nodes = nodes.tail) {
+            node = nodes.head;
+            if (nodes.tail != null)
+                node.setSuccs(nodes.tail.head);
         }
         for (InstrList p = instrs; p != null; p = p.tail) {
             instr = p.head;

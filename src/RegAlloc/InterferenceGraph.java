@@ -15,30 +15,28 @@ import Graph.Node;
 import Graph.NodeList;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Stack;
 
-public class InterferenceGraph extends Graph {
-    private Integer[][] interferenceMatrix;
-    private LinkedList<MovePair> coalescedMoves;
-    private LinkedList<MovePair> constrainedMoves;
-    private LinkedList<MovePair> frozenMoves;
-    private LinkedList<MovePair> worklistMoves;
-    private LinkedList<MovePair> activeMoves;
-    private HashMap<Integer, Integer> alias;
-    private LinkedList<EdgePair> adjSet;
-    private LinkedList<NodeList> adjList;
-    private LinkedList<Node> simplifyWorklist;
-    private LinkedList<Node> freezeWorklist;
-    private LinkedList<Node> spillWorklist;
-    private LinkedList<Node> preColored;
-    private LinkedList<Node> initial;
-    private LinkedList<Node> spilledNodes;
-    private LinkedList<Node> coalescedNodes;
-    private LinkedList<Node> coloredNodes;
-    private Stack<Node> selectStack;
+abstract public class InterferenceGraph extends Graph {
+    protected Integer[][] interferenceMatrix;
+    protected LinkedList<MovePair> coalescedMoves;
+    protected LinkedList<MovePair> constrainedMoves;
+    protected LinkedList<MovePair> frozenMoves;
+    protected LinkedList<MovePair> worklistMoves;
+    protected LinkedList<MovePair> activeMoves;
+    protected HashMap<Integer, Integer> alias;
+    protected LinkedList<EdgePair> adjSet;
+    protected LinkedList<NodeList> adjList;
+    protected LinkedList<Node> simplifyWorklist;
+    protected LinkedList<Node> freezeWorklist;
+    protected LinkedList<Node> spillWorklist;
+    protected LinkedList<Node> preColored;
+    protected LinkedList<Node> initial;
+    protected LinkedList<Node> spilledNodes;
+    protected LinkedList<Node> coalescedNodes;
+    protected LinkedList<Node> coloredNodes;
+    protected Stack<Node> selectStack;
 
     InterferenceGraph() {
         this.coalescedMoves = new LinkedList<MovePair>(); // MovePair has src and dst
@@ -63,34 +61,25 @@ public class InterferenceGraph extends Graph {
         this.interferenceMatrix = new Integer[this.nodecount][this.nodecount];
     }
 
-    private boolean isAdjacent(int x, int y) {
-        if (this.interferenceMatrix[x][y].equals(1) && this.interferenceMatrix[y][x].equals(1)) {
-            return true;
-        }
-        return false;
+    public boolean isAdjacent(int x, int y) {
+        return this.interferenceMatrix[x][y].equals(1) && this.interferenceMatrix[y][x].equals(1);
     }
 
-    public Node tnode(Temp.Temp temp) {
-        return null;
-    }
+    public abstract Node tnode(Temp.Temp temp);
 
-    public Temp.Temp gtemp(Node node) {
-        return null;
-    }
+    public abstract Temp.Temp gtemp(Node node);
 
-    public MoveList moves() {
-        return null;
-    }
+    public abstract MoveList moves();
 
     public int spillCost(Node node) {
         return 1;
     }
 
-    private NodeList GetAllAdjacentNodesFrom(int n) {
+    public NodeList GetAllAdjacentNodesFrom(int n) {
         return adjList.get(n).tail;
     }
 
-    private void initAdjList() {
+    public void initAdjList() {
         for(NodeList p=nodes(); p!=null; p=p.tail) {
             Node n = p.head;
             NodeList list = new NodeList(n, n.adj());

@@ -14,7 +14,7 @@ public class Node {
 
     Graph mygraph;
     private Node() {}
-    int mykey;
+    public int mykey;
     public Node(Graph g) {
         mygraph=g;
         mykey= g.nodecount++;
@@ -40,7 +40,7 @@ public class Node {
         return cat(succ(), pred());
     }
 
-    int len(NodeList l) {
+    public static int len(NodeList l) {
         int i=0;
         for(NodeList p=l; p!=null; p=p.tail) i++;
         return i;
@@ -72,4 +72,13 @@ public class Node {
         return String.valueOf(mykey);
     }
 
+    public void setSuccs(Node node) {
+        if (!Node.inList(node, this.succs))
+            this.succs = new NodeList(node, node.succs);
+    }
+    static boolean inList(Node a, NodeList l) {
+        for(NodeList p=l; p!=null; p=p.tail)
+            if (p.head==a) return true;
+        return false;
+    }
 }

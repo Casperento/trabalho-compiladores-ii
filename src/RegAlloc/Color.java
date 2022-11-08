@@ -15,13 +15,7 @@ public class Color implements TempMap {
     }
     
     public Color(InterferenceGraph ig, TempMap initial, TempList registers){
-        // TODO: regalloc Preparation
-        iteratedRegisterAllocator();
 
-    }
-
-    public void iteratedRegisterAllocator() {
-        // TODO: livenessAnalisys
         // TODO: build
         // TODO: makeWorkList
         // TODO: simplify
@@ -29,5 +23,6 @@ public class Color implements TempMap {
         // TODO: spill
         // TODO: assignColors
         // TODO: rewriteProgram
+
     }
 }

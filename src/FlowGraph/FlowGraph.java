@@ -9,10 +9,10 @@
 // pelo professor ou copiadas das bibliotecas ou do livro Modern Compiler Implementation, foram desenvolvidas por mim. Declaro também que
 // sou (somos) o(s) responsável (éis) por todas as eventuais cópias deste programa e que não distribui (mos) nem facilitei (amos) a distribuição de cópias.
 package FlowGraph;
-import Temp.TempList;
-import Temp.Temp;
-import Graph.NodeList;
+
 import Graph.Node;
+import Graph.NodeList;
+import Temp.TempList;
 
 /**
  * A control flow graph is a directed graph in which each edge
@@ -24,28 +24,22 @@ import Graph.Node;
  * @see AssemFlowGraph
  */
 
-public class FlowGraph extends Graph.Graph {
+public abstract class FlowGraph extends Graph.Graph {
     /**
      * The set of temporaries defined by this instruction or block
      */
-    public TempList def(Node node) {
-        return null;
-    }
+    public abstract TempList def(Node node);
 
     /**
      * The set of temporaries used by this instruction or block
      */
-    public TempList use(Node node) {
-        return null;
-    }
+    public abstract TempList use(Node node);
 
     /**
      * True if this node represents a <strong>move</strong> instruction,
      * i.e. one that can be deleted if def=use.
      */
-    public boolean isMove(Node node) {
-        return false;
-    }
+    public abstract boolean isMove(Node node);
 
     /**
      * Print a human-readable dump for debugging.

@@ -8,6 +8,8 @@
 // Declaro que sou (somos) o(s) único(s) autor(es) e responsável (éis) por este programa. Todas as partes do programa, exceto as que foram fornecidas
 // pelo professor ou copiadas das bibliotecas ou do livro Modern Compiler Implementation, foram desenvolvidas por mim. Declaro também que
 // sou (somos) o(s) responsável (éis) por todas as eventuais cópias deste programa e que não distribui (mos) nem facilitei (amos) a distribuição de cópias.
+
+import Assem.AssemFlowGraph;
 import Assem.InstrList;
 import Mips.MipsFrame;
 import Parser.MiniJavaParser;
@@ -67,7 +69,12 @@ public class Main {
         Tree.StmList traced = (new Canon.TraceSchedule(b)).stms;
         prStmList(traced);
         Assem.InstrList instrs= codegen(f.frame,traced);
-        // TODO: Graph Coloring
+
+        // Register allocation by graph coloring
+        AssemFlowGraph flowgraph = new AssemFlowGraph(instrs);
+        debug.println("# Flowgraph: ");
+        flowgraph.show(out);
+
         debug.println("# Instructions: ");
         for(Assem.InstrList p=instrs; p!=null; p=p.tail){
             debug.print(p.head.format(tempmap) + '\n');

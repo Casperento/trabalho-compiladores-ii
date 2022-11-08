@@ -186,7 +186,7 @@ public class Codegen implements Tree.CodeVisitor
         if (s.exp instanceof Tree.NAME) {
 	    Tree.NAME name = (Tree.NAME)s.exp;
 	    // JUMP(Tree.NAME, List<Label>)
-	    emit(OPER("b " + name.label.toString(), null, null, LabelList.listLabelToList(s.targets)));
+	    emit(OPER("j " + name.label.toString(), null, null, LabelList.listLabelToList(s.targets)));
 	    return;
 	}
 	// JUMP(Exp, List<Label>)

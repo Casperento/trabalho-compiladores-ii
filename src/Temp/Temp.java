@@ -20,4 +20,17 @@ public class Temp extends SimpleExp{
     public int hashCode() { return num; }
     public boolean spillTemp = false;
     public int spillCost;
+
+    public static TempList tempVecToList(Temp[] vec) {
+        if (vec == null)
+            return null;
+        Temp head;
+        TempList tail;
+        tail = new TempList(vec[vec.length-1], null);
+        for (int i = vec.length-2; i >= 0; i--) {
+            head = vec[i];
+            tail = new TempList(head, tail);
+        }
+        return tail;
+    }
 }

@@ -10,14 +10,22 @@
 // sou (somos) o(s) responsável (éis) por todas as eventuais cópias deste programa e que não distribui (mos) nem facilitei (amos) a distribuição de cópias.
 package Temp;
 
-public class Temp extends SimpleExp{
+public class Temp extends SimpleExp {
     private static int count=30;
     private int num;
-    public String toString() {return "t" + num;}
-    public Temp() { num = count++; }
-    public Temp(int t){    num = t ;}
+    public String toString() {
+        return "t" + num;
+    }
+    public Temp() {
+        num = count++;
+    }
+    public Temp(int t) {
+        num = t ;
+    }
 
-    public int hashCode() { return num; }
+    public int hashCode() {
+        return num;
+    }
     public boolean spillTemp = false;
     public int spillCost;
 

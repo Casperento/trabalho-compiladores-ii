@@ -32,7 +32,7 @@ final class VectorEnumerator<A> implements Enumeration<A> {
 
     public A nextElement() {
         Vector<A> var1 = this.vector;
-        synchronized(var1){}
+        synchronized(var1) {}
 
         try {
             if (this.count < this.vector.elementCount) {

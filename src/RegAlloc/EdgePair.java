@@ -9,7 +9,7 @@ public class EdgePair {
         this.src = s;
         this.dst = d;
     }
-    
+
     public Node getSource() {
         return src;
     }

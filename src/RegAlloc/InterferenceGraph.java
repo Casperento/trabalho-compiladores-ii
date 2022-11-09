@@ -86,5 +86,5 @@ abstract public class InterferenceGraph extends Graph {
             adjList.add(list);
         }
     }
-    
+
 }

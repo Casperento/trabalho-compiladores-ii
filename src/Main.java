@@ -43,8 +43,10 @@ public class Main {
             ArrayList<Stm> code = new ArrayList<Stm>();
             code.add(s.head);
             Assem.InstrList i = InstrList.fromArrayList(f.codegen(code));
-            if (last==null) {first=last=i;}
-            else {while (last.tail!=null) last=last.tail;
+            if (last==null) {
+                first=last=i;
+            } else {
+                while (last.tail!=null) last=last.tail;
                 last=last.tail=i;
             }
         }
@@ -75,21 +77,20 @@ public class Main {
         RegAlloc allocator = new RegAlloc(f.frame, instrs);
 
         debug.println("# Instructions: ");
-        for(Assem.InstrList p=instrs; p!=null; p=p.tail){
+        for(Assem.InstrList p=instrs; p!=null; p=p.tail) {
             debug.print(p.head.format(tempmap) + '\n');
             out.print(p.head.format(tempmap) + '\n');
         }
 
     }
 
-    public static void main(String [] args) throws java.io.IOException{
+    public static void main(String [] args) throws java.io.IOException {
         Node root;
         try {
             File inputFile = new File("tests/Factorial.java");
             InputStream stream = new FileInputStream(inputFile);
             root = (new MiniJavaParser(stream)).Goal();
-        }
-        catch (ParseException e){
+        } catch (ParseException e) {
             System.err.println (e.toString() );
             return;
         }
@@ -119,7 +120,7 @@ public class Main {
             //if the fragment is a ProcFrag i.e one which contains a procedure
             //then I get the map of temps associated with it and print it out.
 
-            if (f instanceof ProcFrag){
+            if (f instanceof ProcFrag) {
                 emitProc(out, (ProcFrag) f);
             } else if  (f instanceof DataFrag) {
                 out.print(((DataFrag) f).data);

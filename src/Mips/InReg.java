@@ -14,7 +14,7 @@ import Temp.Temp;
 public class InReg extends Frame.Access {
     Temp temp;
     InReg(Temp t) {
-	temp = t;
+        temp = t;
     }
 
     public Tree.Exp exp(Tree.Exp fp) {

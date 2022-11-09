@@ -13,8 +13,8 @@ public class Color implements TempMap {
     public String tempMap(Temp t) {
         return null;
     }
-    
-    public Color(InterferenceGraph ig, TempMap initial, TempList registers){
+
+    public Color(InterferenceGraph ig, TempMap initial, TempList registers) {
 
         // TODO: build
         // TODO: makeWorkList

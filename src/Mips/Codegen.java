@@ -339,7 +339,7 @@ public class Codegen implements Tree.CodeVisitor
 			left = frame.SP;
 			off += "+" + frame.name + "_framesize";
 		    }
-		    emit(OPER("add `d0, `s0 " + off, new Temp[]{t},
+		    emit(OPER("add `d0, `s0, " + off, new Temp[]{t},
 			      new Temp[]{left}));
 		    return t;
 		}

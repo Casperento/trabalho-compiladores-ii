@@ -47,6 +47,9 @@ public class AssemFlowGraph extends FlowGraph {
                 }
             }
         }
+
+        System.out.println("# Calculated use-defs for each instructions' blocks:\n");
+        this.show(System.out);
     }
 
     @Override

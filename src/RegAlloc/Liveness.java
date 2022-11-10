@@ -11,7 +11,9 @@ import java.util.Hashtable;
 
 public class Liveness extends InterferenceGraph {
     private Dictionary liveMap;
+    public FlowGraph flowgraph;
     public Liveness(FlowGraph flow) {
+        flowgraph = flow;
         int totalNodes = Node.len(flow.nodes());
 
         Dictionary use = new Hashtable();

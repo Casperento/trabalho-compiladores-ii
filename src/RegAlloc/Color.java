@@ -15,6 +15,9 @@ public class Color implements TempMap {
     }
 
     public Color(InterferenceGraph ig, TempMap initial, TempList registers) {
+        // Example to get flowgraph nodes (instructions)
+//        Liveness ref = (Liveness) ig;
+//        NodeList n = ref.flowgraph.nodes();
 
         // TODO: build
         // TODO: makeWorkList

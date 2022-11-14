@@ -10,6 +10,8 @@
 // sou (somos) o(s) responsável (éis) por todas as eventuais cópias deste programa e que não distribui (mos) nem facilitei (amos) a distribuição de cópias.
 package Temp;
 
+import java.util.HashSet;
+
 public class TempList {
     public Temp head;
     public TempList tail;
@@ -22,6 +24,13 @@ public class TempList {
         for(TempList p=l; p!=null; p=p.tail)
             if (p.head==a) return true;
         return false;
+    }
+
+    public HashSet<Temp> toSet() {
+        HashSet<Temp> ret = new HashSet<Temp>();
+        for(TempList p = this; p != null; p = p.tail)
+            ret.add(p.head);
+        return ret;
     }
 
 }

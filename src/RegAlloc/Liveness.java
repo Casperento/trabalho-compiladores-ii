@@ -4,96 +4,98 @@ import FlowGraph.FlowGraph;
 import Graph.Node;
 import Graph.NodeList;
 import Temp.Temp;
-import Temp.TempList;
 
 import java.util.Dictionary;
+import java.util.HashSet;
 import java.util.Hashtable;
 
 public class Liveness extends InterferenceGraph {
-    private Dictionary liveMap;
+    private Dictionary<Integer, HashSet<Temp>> liveMap;
     public FlowGraph flowgraph;
     public Liveness(FlowGraph flow) {
         flowgraph = flow;
         int totalNodes = Node.len(flow.nodes());
 
-        Dictionary use = new Hashtable();
-        Dictionary def = new Hashtable();
-        Dictionary succ = new Hashtable();
-        Dictionary in = new Hashtable();
-        Dictionary inl = new Hashtable();
-        Dictionary out = new Hashtable();
-        Dictionary outl = new Hashtable();
+        Dictionary<Integer, HashSet<Temp>> use = new Hashtable<Integer, HashSet<Temp>>();
+        Dictionary<Integer, HashSet<Temp>> def = new Hashtable<Integer, HashSet<Temp>>();
+        Dictionary<Integer, NodeList> succ = new Hashtable<Integer, NodeList>();
+        Dictionary<Integer, HashSet<Temp>> in = new Hashtable<Integer, HashSet<Temp>>();
+        Dictionary<Integer, HashSet<Temp>> inl = new Hashtable<Integer, HashSet<Temp>>();
+        Dictionary<Integer, HashSet<Temp>> out = new Hashtable<Integer, HashSet<Temp>>();
+        Dictionary<Integer, HashSet<Temp>> outl = new Hashtable<Integer, HashSet<Temp>>();
 
         Node n;
         for (NodeList p = flow.nodes(); p != null; p = p.tail) {
             n = p.head;
             if (flow.use(n) != null)
-                use.put(n.mykey, flow.use(n));
+                use.put(n.mykey, flow.use(n).toSet());
+            else
+                use.put(n.mykey, new HashSet<Temp>());
 
             if (flow.def(n) != null)
-                def.put(n.mykey, flow.def(n));
+                def.put(n.mykey, flow.def(n).toSet());
+            else
+                def.put(n.mykey, new HashSet<Temp>());
 
             if (n.succ() != null)
                 succ.put(n.mykey, n.succ());
+            else
+                succ.put(n.mykey, new NodeList(null, null));
         }
 
         // for each n
         for (int i = 0; i < totalNodes; i++) {
-            in.put(i, new TempList(null, null));
-            out.put(i, new TempList(null, null));
+            in.put(i, new HashSet<Temp>());
+            out.put(i, new HashSet<Temp>());
         }
 
         // repeat-until
-        int[] iterateds = new int[totalNodes];
-        int sum = 0;
-        TempList diff = new TempList(null, null), tmp, union, un;
-        do {
+        boolean until_eval = true;
+        HashSet<Temp> t1;
+        HashSet<Temp> t2;
+        HashSet<Temp> t3;
+        HashSet<Temp> t4;
+        HashSet<Temp> outUnion;
+        while (until_eval) {
             for (int nn = totalNodes - 1; nn >= 0; nn--) {
-                inl.put(nn, in.get(nn)); // inl_n = in_n
-                outl.put(nn, out.get(nn)); // outl_n = out_n
+                inl.put(nn, new HashSet<Temp>(in.get(nn))); // inl_n = in_n
+                outl.put(nn, new HashSet<Temp>(out.get(nn))); // outl_n = out_n
 
                 // diff = out_n - def_n
-                tmp = (TempList) def.get(nn);
-                for (TempList on = (TempList) out.get(nn); on != null; on = on.tail) {
-                    if (on.head != null && !TempList.inList(on.head, tmp)) {
-                        diff = new TempList(on.head, diff);
-                    }
-                }
+                t1 = out.get(nn);
+                t1.removeAll(def.get(nn));
 
                 // in_n = use_n | diff
-                union = (TempList) use.get(nn);
-                for (un = union; un != null; un = un.tail) { // get last (null tail) element reference
-                    if (un.head != null && un.tail == null) {
-                        un.tail = diff;
-                        break;
-                    }
-                }
-
-                if (union != null)
-                    in.put(nn, union);
+                t2 = use.get(nn);
+                t2.addAll(t1);
+                in.put(nn, t2);
 
                 // out_n = U_s_succ in_s
-                for (NodeList g = (NodeList) succ.get(nn); g != null; g = g.tail) {
-                    out.put(nn, in.get(g.head.mykey));
+                outUnion = new HashSet<Temp>();
+                for (NodeList s = succ.get(nn); s != null; s = s.tail) {
+                    if (s.head != null)
+                        outUnion.addAll(in.get(s.head.mykey));
                 }
+                out.put(nn, outUnion);
             }
 
+            until_eval = false;
             for (int r = 0; r < totalNodes; r++) {
-                if (outl.get(r) == out.get(r) && inl.get(r) == in.get(r)) {
-                    iterateds[r] = 1;
+                t1 = outl.get(r);
+                t2 = inl.get(r);
+                t3 = out.get(r);
+                t4 = in.get(r);
+                if (!(t1.containsAll(t3) && t1.size() == t3.size()) || !(t2.containsAll(t4) && t2.size() == t4.size())) {
+                    until_eval = true;
+                    break;
                 }
             }
-
-            sum = 0;
-            for (int r = 0; r < totalNodes; r++)
-                sum += iterateds[r];
-
-        } while (sum < totalNodes);
+        }
         liveMap = out;
     }
 
-    public TempList liveOut(int n) {
-        return (TempList) liveMap.get(n);
+    public HashSet<Temp> liveOut(int n) {
+        return liveMap.get(n);
     }
 
     @Override

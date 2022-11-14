@@ -74,7 +74,7 @@ public class Node {
 
     public void setSuccs(Node node) {
         if (!Node.inList(node, this.succs))
-            this.succs = new NodeList(node, node.succs);
+            this.succs = new NodeList(node, this.succs);
     }
     static boolean inList(Node a, NodeList l) {
         for(NodeList p=l; p!=null; p=p.tail)

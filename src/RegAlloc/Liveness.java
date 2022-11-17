@@ -62,19 +62,22 @@ public class Liveness extends InterferenceGraph {
                 outl.put(nn, new HashSet<Temp>(out.get(nn))); // outl_n = out_n
 
                 // diff = out_n - def_n
-                t1 = out.get(nn);
-                t1.removeAll(def.get(nn));
+                t1 = new HashSet<Temp>(out.get(nn));
+                t2 = new HashSet<Temp>(def.get(nn));
+                t1.removeAll(t2);
 
                 // in_n = use_n | diff
-                t2 = use.get(nn);
-                t2.addAll(t1);
-                in.put(nn, t2);
+                t3 = new HashSet<Temp>(use.get(nn));
+                t3.addAll(t1);
+                in.put(nn, t3);
 
                 // out_n = U_s_succ in_s
                 outUnion = new HashSet<Temp>();
                 for (NodeList s = succ.get(nn); s != null; s = s.tail) {
-                    if (s.head != null)
-                        outUnion.addAll(in.get(s.head.mykey));
+                    if (s.head != null) {
+                        t1 = new HashSet<Temp>(in.get(s.head.mykey));
+                        outUnion.addAll(t1);
+                    }
                 }
                 out.put(nn, outUnion);
             }

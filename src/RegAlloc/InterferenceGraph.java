@@ -16,6 +16,7 @@ import Graph.NodeList;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 
 abstract public class InterferenceGraph extends Graph {
@@ -37,6 +38,8 @@ abstract public class InterferenceGraph extends Graph {
     protected LinkedList<Node> coalescedNodes;
     protected LinkedList<Node> coloredNodes;
     protected Stack<Node> selectStack;
+    protected LinkedList<MoveList> moveList;
+    protected Integer[] degree;
 
     InterferenceGraph() {
         this.coalescedMoves = new LinkedList<MovePair>(); // MovePair has src and dst
@@ -55,6 +58,8 @@ abstract public class InterferenceGraph extends Graph {
         this.spilledNodes = new LinkedList<Node>();
         this.coalescedNodes = new LinkedList<Node>();
         this.coloredNodes = new LinkedList<Node>();
+        this.moveList = new LinkedList<MoveList>();
+        this.degree = new Integer[this.nodecount];
     }
 
     public void initInterferenceMatrix() {  // init bit matrix after all nodes been created

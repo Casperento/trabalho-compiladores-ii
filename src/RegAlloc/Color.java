@@ -2,23 +2,12 @@ package RegAlloc;
 
 import Graph.Node;
 import Graph.NodeList;
-
-import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
-
-import Graph.Node;
-import Graph.NodeList;
 import Mips.MipsFrame;
 import Temp.Temp;
 import Temp.TempList;
 import Temp.TempMap;
 
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.*;
 
 public class Color implements TempMap {
 
@@ -105,7 +94,7 @@ public class Color implements TempMap {
                 initial.setInitial(tmp);
                 if (ref.degree[ref.tnode(i).mykey] >= K) {
                     ref.spillWorklist.add(ref.tnode(i));
-                } else if (moveRelated(ref.tnode(i))) { // TODO: implementar essa função
+                } else if (moveRelated(ig, ref.tnode(i))) { // TODO: implementar essa função
                     ref.freezeWorklist.add(ref.tnode(i));
                 }
                 else {

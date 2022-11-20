@@ -113,6 +113,12 @@ public class Liveness extends InterferenceGraph {
 
     @Override
     public MoveList moves() {
-        return null; // TODO: impl
+        MoveList moveList = new MoveList(null, null, null);
+        for (NodeList node = flowgraph.nodes(); node != null; node = node.tail) {
+            if (flowgraph.isMove(node.head)) {
+                moveList = new MoveList(null, null, moveList);
+            }
+        }
+        return moveList;
     }
 }

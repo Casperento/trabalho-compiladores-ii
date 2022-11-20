@@ -170,6 +170,34 @@ public class MipsFrame extends Frame {
     // registers that a callee may use without preserving
     callerSaves = { T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, V0, V1 };
 
+    public LinkedList<Temp> getInitial() {
+        return initial;
+    }
+
+    public void setInitial(LinkedList<Temp> initial) {
+        this.initial = initial;
+    }
+
+    private LinkedList<Temp> initial = new LinkedList<Temp>();
+
+    {
+        initial.add(T1);
+        initial.add(T2);
+        initial.add(T3);
+        initial.add(T4);
+        initial.add(T5);
+        initial.add(T6);
+        initial.add(T7);
+        initial.add(T9);
+        initial.add(S1);
+        initial.add(S2);
+        initial.add(S3);
+        initial.add(S4);
+        initial.add(S5);
+        initial.add(S6);
+        initial.add(S7);
+    }
+
     static final Temp FP = new Temp(); // virtual frame pointer (eliminated)
     public Temp FP() {
         return FP;

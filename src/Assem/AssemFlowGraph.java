@@ -14,6 +14,16 @@ public class AssemFlowGraph extends FlowGraph {
 
     Dictionary tableNodeInstr = new Hashtable();
     Dictionary tableInstrNode = new Hashtable();
+    Dictionary tableNodeTemp = new Hashtable();
+    Dictionary tableTempNode = new Hashtable();
+
+    public Dictionary getTableNodeTemp() {
+        return tableNodeTemp;
+    }
+
+    public Dictionary getTableTempNode() {
+        return tableTempNode;
+    }
 
     public Instr instr(Node n) {
         return (Instr) tableNodeInstr.get(n);
@@ -22,11 +32,23 @@ public class AssemFlowGraph extends FlowGraph {
     public AssemFlowGraph(InstrList instrs) {
         Instr instr, jmpInstr = null;
         Node node;
+
         for (InstrList p = instrs; p != null; p = p.tail) {
             instr = p.head;
             node = this.newNode();
             tableNodeInstr.put(node, instr);
             tableInstrNode.put(instr, node);
+
+            if (instr.def == null || instr.use == null)
+                continue;
+
+            Temp[] temps = new Temp[instr.def.length + instr.use.length];
+            for (int t = 0; t < instr.def.length; t++)
+                temps[t] = instr.def[t];
+            for (int t = instr.def.length; t < instr.use.length; t++)
+                temps[t] = instr.use[t];
+            tableNodeTemp.put(node, temps);
+            tableTempNode.put(temps, node);
         }
         for (NodeList nodes = this.nodes(); nodes != null; nodes = nodes.tail) {
             node = nodes.head;
@@ -55,17 +77,23 @@ public class AssemFlowGraph extends FlowGraph {
     @Override
     public TempList def(Node node) {
         Temp[] defVec = instr(node).def;
+        if (defVec == null)
+            return new TempList(null, null);
         return Temp.tempVecToList(defVec);
     }
 
     @Override
     public TempList use(Node node) {
         Temp[] useVec = instr(node).use;
+        if (useVec == null)
+            return new TempList(null, null);
         return Temp.tempVecToList(useVec);
     }
 
     @Override
     public boolean isMove(Node node) {
+        if (instr(node).def == null || instr(node).use == null)
+            return false;
         return (instr(node).def == instr(node).use);
     }
 

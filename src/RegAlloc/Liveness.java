@@ -1,6 +1,6 @@
 package RegAlloc;
 
-import FlowGraph.FlowGraph;
+import Assem.AssemFlowGraph;
 import Graph.Node;
 import Graph.NodeList;
 import Temp.Temp;
@@ -11,8 +11,8 @@ import java.util.Hashtable;
 
 public class Liveness extends InterferenceGraph {
     private Dictionary<Integer, HashSet<Temp>> liveMap;
-    public FlowGraph flowgraph;
-    public Liveness(FlowGraph flow) {
+    public AssemFlowGraph flowgraph;
+    public Liveness(AssemFlowGraph flow) {
         flowgraph = flow;
         int totalNodes = Node.len(flow.nodes());
 
@@ -103,12 +103,12 @@ public class Liveness extends InterferenceGraph {
 
     @Override
     public Node tnode(Temp temp) {
-        return null; // TODO: impl
+        return (Node) flowgraph.getTableTempNode().get(temp);
     }
 
     @Override
     public Temp gtemp(Node node) {
-        return null; // TODO: impl
+        return (Temp) flowgraph.getTableNodeTemp().get(node);
     }
 
     @Override

@@ -2,19 +2,17 @@ package RegAlloc;
 
 import Graph.Node;
 import Graph.NodeList;
-import java.util.HashSet;
-import java.util.LinkedList;
-
-import Graph.Node;
-import Graph.NodeList;
 import Mips.MipsFrame;
 import Temp.Temp;
 import Temp.TempList;
 import Temp.TempMap;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+
 public class Color implements TempMap {
 
-    private int K = 15;
+    private final int K = 15;
 
     public TempList spills() {
         return null;
@@ -25,21 +23,26 @@ public class Color implements TempMap {
     }
 
     public Color(InterferenceGraph ig, MipsFrame initial, TempList registers) {
-        // TODO: build
         build(ig);
-        // TODO: makeWorkList
         makeWorkLists(initial, ig);
 
-        // TODO: repeat-until
-        if (!ig.simplifyWorklist.isEmpty()) { // TODO: simplify
-            simplify(ig);
-        } else if (!ig.worklistMoves.isEmpty()) {
-            // TODO: coalesce
-        } else if (!ig.freezeWorklist.isEmpty()) {
-            // TODO: freeze
-        } else if (!ig.spillWorklist.isEmpty()) {
-            // TODO: selectSpill
+        boolean until_eval = true;
+        while (until_eval) {
+            if (!ig.simplifyWorklist.isEmpty()) {
+                simplify(ig);
+            } else if (!ig.worklistMoves.isEmpty()) {
+                // TODO: coalesce
+            } else if (!ig.freezeWorklist.isEmpty()) {
+                // TODO: freeze
+            } else if (!ig.spillWorklist.isEmpty()) {
+                // TODO: selectSpill
+            }
+            until_eval = !ig.simplifyWorklist.isEmpty() ||
+                         !ig.worklistMoves.isEmpty() ||
+                         !ig.freezeWorklist.isEmpty() ||
+                         !ig.spillWorklist.isEmpty();
         }
+
         // TODO: assignColors
 
         if (!ig.spilledNodes.isEmpty()) {

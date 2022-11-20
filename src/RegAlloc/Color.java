@@ -2,8 +2,13 @@ package RegAlloc;
 
 import Graph.Node;
 import Graph.NodeList;
+
+import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.List;
 
 import Graph.Node;
 import Graph.NodeList;
@@ -41,6 +46,7 @@ public class Color implements TempMap {
             // TODO: selectSpill
         }
         // TODO: assignColors
+        assignCollors(ig);
 
         if (!ig.spilledNodes.isEmpty()) {
             // TODO: rewriteProgram
@@ -53,6 +59,10 @@ public class Color implements TempMap {
         Liveness ref = (Liveness) ig;
         NodeList n = ref.flowgraph.nodes();
 
+        for (int i = 0; i < Node.len(ref.flowgraph.nodes()); i++) {
+            ref.moveList.add(new MoveList(null, null, null));
+        }
+
         for(NodeList p=n; p!=null; p=p.tail){
             HashSet<Temp> live = new HashSet<Temp>(ref.liveOut(p.head.mykey));
             if(ref.flowgraph.isMove(p.head)){
@@ -60,13 +70,13 @@ public class Color implements TempMap {
                 HashSet<Temp> defUse = new HashSet<Temp>(union(ref.flowgraph.def(p.head).toSet(), ref.flowgraph.use(p.head).toSet()));
 
                 for (Temp i: defUse) {
-                    for(NodeList j=p.head.succ(); j!=null; j=j.tail){
-                        ref.moveList.get(ref.tnode(i).mykey).tail = new MoveList(p.head, j.head, ref.moveList.get(ref.tnode(i).mykey).tail); // TODO: inicializar movelist / avaliar instruções move
-                    }
+                    ref.moveList.get(ref.tnode(i).mykey).tail = new MoveList(p.head, p.head, ref.moveList.get(ref.tnode(i).mykey).tail); // TODO: inicializar movelist / avaliar instruções move
                 }
                 ref.worklistMoves.add(new MovePair(p.head, p.head)); // TODO: Dest
             }
             live.addAll(ref.flowgraph.def(p.head).toSet());
+            ref.initAdjList();
+            ref.initInterferenceMatrix();
             for (Temp i: ref.flowgraph.def(p.head).toSet()) {
                 for (Temp l: live) {
                     addEdge(l, i, ref);
@@ -88,13 +98,50 @@ public class Color implements TempMap {
                 initial.setInitial(tmp);
                 if (ref.degree[ref.tnode(i).mykey] >= K) {
                     ref.spillWorklist.add(ref.tnode(i));
-//                } else if (moveRelated(ref.tnode(i))) { // TODO: implementar essa função
-//                    ref.freezeWorklist.add(ref.tnode(i));
+                } else if (moveRelated(ref.tnode(i))) { // TODO: implementar essa função
+                    ref.freezeWorklist.add(ref.tnode(i));
                 }
                 else {
                     ref.simplifyWorklist.add(ref.tnode(i));
                 }
             }
+        }
+    }
+
+    private void assignCollors(InterferenceGraph ig) {
+        Liveness ref = (Liveness) ig;
+        List<Integer> okColors = new ArrayList<>();
+        Integer c = 0;
+
+        Dictionary regIndce = new Hashtable();
+        for (int i = 0; i < K; i++) {
+            regIndce.put(i, ref.initial.get(i));
+        }
+
+        while (!ref.selectStack.empty()) {
+            Node n = ref.selectStack.pop();
+            okColors.clear();
+            for (int i = 0; i < K; i++) {
+                okColors.add(i);
+            }
+
+            for (NodeList p = ref.adjList.get(n.mykey); p!=null; p=p.tail) {
+                if (ref.preColored.contains(getAlias(ref, p.head)) || ref.coalescedNodes.contains(getAlias(ref, p.head))) {
+                    okColors.remove(ref.color[getAlias(ref, p.head).mykey]);
+                }
+            }
+
+            if (okColors.size() == 0) {
+                ref.spilledNodes.add(n);
+            } else {
+                ref.coloredNodes.add(n);
+                c = okColors.get(0);
+                ref.color[n.mykey] = c;
+            }
+        }
+
+        for (Node x: ref.coalescedNodes) {
+            ref.color[x.mykey] = getAlias(ref, x).mykey;
         }
     }
 
@@ -180,6 +227,14 @@ public class Color implements TempMap {
                     ig.worklistMoves.add(tmp);
                 }
             }
+        }
+    }
+
+    private Node getAlias(Liveness ref, Node n) {
+        if (ref.coalescedNodes.contains(n)) {
+            return getAlias(ref, ref.adjList.get(ref.alias.get(n.mykey)).head);
+        } else {
+            return n;
         }
     }
 

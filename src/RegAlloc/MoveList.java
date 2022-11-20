@@ -18,5 +18,11 @@ public class MoveList {
         dst=d;
         tail=t;
     }
+
+    public static int len(MoveList l) {
+        int i=0;
+        for(MoveList p=l; p!=null; p=p.tail) i++;
+        return i;
+    }
 }
 

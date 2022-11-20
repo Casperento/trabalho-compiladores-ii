@@ -5,24 +5,24 @@ import Graph.Node;
 import Graph.NodeList;
 import Temp.Temp;
 
-import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.Map;
 
 public class Liveness extends InterferenceGraph {
-    private Dictionary<Integer, HashSet<Temp>> liveMap;
+    private Map<Integer, HashSet<Temp>> liveMap;
+    Map<Integer, HashSet<Temp>> use = new HashMap<Integer, HashSet<Temp>>();
+    Map<Integer, HashSet<Temp>> def = new HashMap<Integer, HashSet<Temp>>();
     public AssemFlowGraph flowgraph;
     public Liveness(AssemFlowGraph flow) {
         flowgraph = flow;
         int totalNodes = Node.len(flow.nodes());
 
-        Dictionary<Integer, HashSet<Temp>> use = new Hashtable<Integer, HashSet<Temp>>();
-        Dictionary<Integer, HashSet<Temp>> def = new Hashtable<Integer, HashSet<Temp>>();
-        Dictionary<Integer, NodeList> succ = new Hashtable<Integer, NodeList>();
-        Dictionary<Integer, HashSet<Temp>> in = new Hashtable<Integer, HashSet<Temp>>();
-        Dictionary<Integer, HashSet<Temp>> inl = new Hashtable<Integer, HashSet<Temp>>();
-        Dictionary<Integer, HashSet<Temp>> out = new Hashtable<Integer, HashSet<Temp>>();
-        Dictionary<Integer, HashSet<Temp>> outl = new Hashtable<Integer, HashSet<Temp>>();
+        Map<Integer, NodeList> succ = new HashMap<Integer, NodeList>();
+        Map<Integer, HashSet<Temp>> in = new HashMap<Integer, HashSet<Temp>>();
+        Map<Integer, HashSet<Temp>> inl = new HashMap<Integer, HashSet<Temp>>();
+        Map<Integer, HashSet<Temp>> out = new HashMap<Integer, HashSet<Temp>>();
+        Map<Integer, HashSet<Temp>> outl = new HashMap<Integer, HashSet<Temp>>();
 
         Node n;
         for (NodeList p = flow.nodes(); p != null; p = p.tail) {
@@ -103,22 +103,31 @@ public class Liveness extends InterferenceGraph {
 
     @Override
     public Node tnode(Temp temp) {
-        return (Node) flowgraph.getTableTempNode().get(temp);
+        for (Temp[] tv: flowgraph.getTableTempNode().keySet()) {
+            for (Temp value : tv)
+                if (value == temp)
+                    return flowgraph.getTableTempNode().get(tv);
+        }
+        return null;
     }
 
     @Override
     public Temp gtemp(Node node) {
-        return (Temp) flowgraph.getTableNodeTemp().get(node);
+        Temp[] tv = flowgraph.getTableNodeTemp().get(node);
+        return tv[0];
     }
 
     @Override
     public MoveList moves() {
-        MoveList moveList = new MoveList(null, null, null);
+        MoveList mvList = new MoveList(null, null, null);
+        Temp s, d;
         for (NodeList node = flowgraph.nodes(); node != null; node = node.tail) {
             if (flowgraph.isMove(node.head)) {
-                moveList = new MoveList(null, null, moveList);
+                s = (Temp) this.use.get(node.head.mykey).toArray()[0];
+                d = (Temp) this.def.get(node.head.mykey).toArray()[0];
+                mvList = new MoveList(this.tnode(s), this.tnode(d), mvList);
             }
         }
-        return moveList;
+        return mvList;
     }
 }

@@ -76,7 +76,7 @@ public class Node {
         if (!Node.inList(node, this.succs))
             this.succs = new NodeList(node, this.succs);
     }
-    static boolean inList(Node a, NodeList l) {
+    public static boolean inList(Node a, NodeList l) {
         for(NodeList p=l; p!=null; p=p.tail)
             if (p.head==a) return true;
         return false;

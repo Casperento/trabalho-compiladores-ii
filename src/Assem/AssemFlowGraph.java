@@ -7,21 +7,21 @@ import Temp.Label;
 import Temp.Temp;
 import Temp.TempList;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AssemFlowGraph extends FlowGraph {
 
-    Dictionary tableNodeInstr = new Hashtable();
-    Dictionary tableInstrNode = new Hashtable();
-    Dictionary tableNodeTemp = new Hashtable();
-    Dictionary tableTempNode = new Hashtable();
+    Map<Node, Instr> tableNodeInstr = new HashMap<Node, Instr>();
+    Map<Instr, Node> tableInstrNode = new HashMap<Instr, Node>();
+    Map<Node, Temp[]> tableNodeTemp = new HashMap<Node, Temp[]>();
+    Map<Temp[], Node> tableTempNode = new HashMap<Temp[], Node>();
 
-    public Dictionary getTableNodeTemp() {
+    public Map<Node, Temp[]> getTableNodeTemp() {
         return tableNodeTemp;
     }
 
-    public Dictionary getTableTempNode() {
+    public Map<Temp[], Node> getTableTempNode() {
         return tableTempNode;
     }
 
@@ -92,9 +92,7 @@ public class AssemFlowGraph extends FlowGraph {
 
     @Override
     public boolean isMove(Node node) {
-        if (instr(node).def == null || instr(node).use == null)
-            return false;
-        return (instr(node).def == instr(node).use);
+        return (instr(node) instanceof MOVE);
     }
 
 }

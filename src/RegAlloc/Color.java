@@ -127,44 +127,48 @@ public class Color implements TempMap {
         }
     }
 
-    // TODO: change adjList search Node approach
     void simplify(InterferenceGraph ig) {
-        for (Node n : ig.simplifyWorklist) {
-            ig.selectStack.push(n);
-            adjacent(ig, n);
-            for (NodeList m = ig.adjList.get(ig.adjList.indexOf(n)); m != null; m = m.tail)
+        Node node = null;
+        for (int i = 0; i < ig.simplifyWorklist.size(); i++) {
+            if (ig.simplifyWorklist.get(i).degree() < K) {
+                node = ig.simplifyWorklist.get(i);
+                break;
+            }
+        }
+
+        if (node != null) {
+            ig.simplifyWorklist.removeFirstOccurrence(node);
+            ig.selectStack.push(node);
+            adjacent(ig, node);
+            for (NodeList m = ig.adjList.get(node.mykey); m != null; m = m.tail)
                 decrementDegree(ig, m.head);
-            ig.simplifyWorklist.removeFirstOccurrence(n);
         }
     }
 
     void adjacent(InterferenceGraph ig, Node n) {
-        NodeList adj = ig.adjList.get(ig.adjList.indexOf(n));
-
-        // TODO: selectStack | coalescedNodes
-        NodeList union = new NodeList(null, null);
+        NodeList adj = ig.adjList.get(n.mykey), union = new NodeList(null, null);
 
         for (Node c : ig.coalescedNodes)
             union = new NodeList(c, union);
 
         for (Node node : ig.selectStack)
-            union = new NodeList(node, union); // TODO: do not add existant Node
+            if (!Node.inList(node, union))
+                union = new NodeList(node, union);
 
         for (NodeList u = union; u != null; u = u.tail)
-            adj = new NodeList(u.head, adj);
+            if (!Node.inList(u.head, adj))
+                adj = new NodeList(u.head, adj);
 
-        ig.adjList.set(ig.adjList.indexOf(n), adj);
+        ig.adjList.set(n.mykey, adj);
     }
 
     void decrementDegree(InterferenceGraph ig, Node m) {
-        int d = 0;
-        // TODO: degree[m]
-        // int d = degree[m.mykey];
+        int d = ig.degree[m.mykey];
         if (d == K) {
             adjacent(ig, m);
-            enableMoves(ig, ig.adjList.get(ig.adjList.indexOf(m)));
+            enableMoves(ig, ig.adjList.get(m.mykey));
             if (ig.spillWorklist.remove(m)) {
-                if (moveRelated(m)) {
+                if (moveRelated(ig, m)) {
                     ig.freezeWorklist.add(m);
                 } else {
                     ig.simplifyWorklist.add(m);
@@ -174,25 +178,47 @@ public class Color implements TempMap {
     }
 
     void enableMoves(InterferenceGraph ig, NodeList nodes) {
-        MovePair tmp;
+        Node s, d;
+        MovePair el = null;
         for (NodeList n = nodes; n != null; n = n.tail) {
             for (MoveList m = nodeMoves(ig, n.head); m != null; m = m.tail) {
-                tmp = new MovePair(m.src, m.dst); // TODO: change MovePair object to following remove and add methods work
-                if (ig.activeMoves.contains(tmp)) {
-                    ig.activeMoves.remove(tmp);
-                    ig.worklistMoves.add(tmp);
+                s = m.src;
+                d = m.dst;
+                for (MovePair mv: ig.activeMoves) {
+                    if (s.mykey == mv.getSource().mykey && d.mykey == mv.getDest().mykey) {
+                        el = mv;
+                        break;
+                    }
+                }
+                if (el != null) {
+                    ig.activeMoves.remove(el);
+                    ig.worklistMoves.add(el); // TODO: test and fix possible issue on not finding el MovePair
+                    el = null;
                 }
             }
         }
     }
 
-    boolean moveRelated(Node m) {
-        // TODO: NodeMoves(n) != {}
-        return false;
+    boolean moveRelated(InterferenceGraph ig, Node m) {
+        return (MoveList.len(nodeMoves(ig, m)) != 0);
     }
 
     MoveList nodeMoves(InterferenceGraph ig, Node n) {
-        // TODO: moveList[n] & (activeNodes | worklistMoves)
-        return null;
+        LinkedList<MovePair> union = new LinkedList<MovePair>(ig.activeMoves);
+        for (MovePair w: ig.worklistMoves)
+            if (!union.contains(w))
+                union.add(w);
+
+        MoveList intersect = new MoveList(null, null, null);
+        Node s, d;
+        for (MoveList mv = ig.moveList.get(n.mykey); mv != null; mv = mv.tail) {
+            s = mv.src;
+            d = mv.dst;
+            for (MovePair m: union)
+                if (s.mykey == m.getSource().mykey && d.mykey == m.getDest().mykey)
+                    intersect = new MoveList(s, d, intersect);
+        }
+
+        return intersect;
     }
 }

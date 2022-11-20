@@ -54,10 +54,17 @@ public class Color implements TempMap {
     private void build(InterferenceGraph ig) {
         Liveness ref = (Liveness) ig;
         NodeList n = ref.flowgraph.nodes();
+        ref.degree = new Integer[Node.len(ref.flowgraph.nodes())];
+        ref.color = new Integer[Node.len(ref.flowgraph.nodes())];
 
         for (int i = 0; i < Node.len(ref.flowgraph.nodes()); i++) {
             ref.moveList.add(new MoveList(null, null, null));
+            ref.degree[i] = 0;
+            ref.color[i] = 0;
         }
+
+        ref.initAdjList(((Liveness) ig).flowgraph);
+        ref.initInterferenceMatrix();
 
         for(NodeList p=n; p!=null; p=p.tail){
             HashSet<Temp> live = new HashSet<Temp>(ref.liveOut(p.head.mykey));
@@ -66,13 +73,12 @@ public class Color implements TempMap {
                 HashSet<Temp> defUse = new HashSet<Temp>(union(ref.flowgraph.def(p.head).toSet(), ref.flowgraph.use(p.head).toSet()));
 
                 for (Temp i: defUse) {
-                    ref.moveList.get(ref.tnode(i).mykey).tail = new MoveList(p.head, p.head, ref.moveList.get(ref.tnode(i).mykey).tail); // TODO: inicializar movelist / avaliar instruções move
+                    if (ref.tnode(i) != null)
+                        ref.moveList.get(ref.tnode(i).mykey).tail = new MoveList(p.head, p.head, ref.moveList.get(ref.tnode(i).mykey).tail); // TODO: inicializar movelist / avaliar instruções move
                 }
                 ref.worklistMoves.add(new MovePair(p.head, p.head)); // TODO: Dest
             }
             live.addAll(ref.flowgraph.def(p.head).toSet());
-            ref.initAdjList();
-            ref.initInterferenceMatrix();
             for (Temp i: ref.flowgraph.def(p.head).toSet()) {
                 for (Temp l: live) {
                     addEdge(l, i, ref);
@@ -92,12 +98,15 @@ public class Color implements TempMap {
             tmp = initial.getInitial();
             if (tmp.remove(i)) {
                 initial.setInitial(tmp);
+
+                if (ref.tnode(i) == null)
+                    continue;
+
                 if (ref.degree[ref.tnode(i).mykey] >= K) {
                     ref.spillWorklist.add(ref.tnode(i));
-                } else if (moveRelated(ig, ref.tnode(i))) { // TODO: implementar essa função
+                } else if (moveRelated(ig, ref.tnode(i))) {
                     ref.freezeWorklist.add(ref.tnode(i));
-                }
-                else {
+                } else {
                     ref.simplifyWorklist.add(ref.tnode(i));
                 }
             }
@@ -153,6 +162,10 @@ public class Color implements TempMap {
     private void addEdge(Temp l, Temp i, Liveness ref) {
         EdgePair aux = new EdgePair(ref.tnode(l), ref.tnode(i));
         EdgePair aux2 = new EdgePair(ref.tnode(i), ref.tnode(l));
+
+        if (ref.tnode(i) == null || ref.tnode(l) == null)
+            return;
+
         if (!ref.adjSet.contains(aux) && (ref.tnode(l).mykey != ref.tnode(i).mykey)) {
             ref.adjSet.add(aux);
             ref.adjSet.add(aux2);

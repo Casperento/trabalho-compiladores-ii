@@ -10,11 +10,11 @@
 // sou (somos) o(s) responsável (éis) por todas as eventuais cópias deste programa e que não distribui (mos) nem facilitei (amos) a distribuição de cópias.
 package RegAlloc;
 
+import Assem.AssemFlowGraph;
 import Graph.Graph;
 import Graph.Node;
 import Graph.NodeList;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Stack;
@@ -60,8 +60,7 @@ abstract public class InterferenceGraph extends Graph {
         this.coalescedNodes = new LinkedList<Node>();
         this.coloredNodes = new LinkedList<Node>();
         this.moveList = new LinkedList<MoveList>();
-        this.degree = new Integer[this.nodecount];
-        this.color = new Integer[this.nodecount];
+        this.adjList = new LinkedList<NodeList>();
     }
 
     public void initInterferenceMatrix() {  // init bit matrix after all nodes been created
@@ -86,8 +85,8 @@ abstract public class InterferenceGraph extends Graph {
         return adjList.get(n).tail;
     }
 
-    public void initAdjList() {
-        for(NodeList p=nodes(); p!=null; p=p.tail) {
+    public void initAdjList(AssemFlowGraph flowGraph) {
+        for(NodeList p = flowGraph.nodes(); p!=null; p=p.tail) {
             Node n = p.head;
             NodeList list = new NodeList(n, n.adj());
             adjList.add(list);

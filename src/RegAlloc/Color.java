@@ -54,16 +54,17 @@ public class Color implements TempMap {
     private void build(InterferenceGraph ig) {
         Liveness ref = (Liveness) ig;
         NodeList n = ref.flowgraph.nodes();
-        ref.degree = new Integer[Node.len(ref.flowgraph.nodes())];
-        ref.color = new Integer[Node.len(ref.flowgraph.nodes())];
+        int totalNodes = Node.len(ref.nodes());
 
-        for (int i = 0; i < Node.len(ref.flowgraph.nodes()); i++) {
+        ref.degree = new Integer[totalNodes];
+        ref.color = new Integer[totalNodes];
+        for (int i = 0; i < totalNodes; i++) {
             ref.moveList.add(new MoveList(null, null, null));
             ref.degree[i] = 0;
             ref.color[i] = 0;
         }
 
-        ref.initAdjList(((Liveness) ig).flowgraph);
+        ref.initAdjList(ig);
         ref.initInterferenceMatrix();
 
         for(NodeList p=n; p!=null; p=p.tail){
@@ -177,6 +178,8 @@ public class Color implements TempMap {
                 ref.adjList.get(ref.tnode(i).mykey).tail = new NodeList(ref.tnode(l), ref.adjList.get(ref.tnode(i).mykey).tail);
                 ref.degree[ref.tnode(i).mykey] += 1;
             }
+            // Set corresponding bits on the interference matrix
+            ref.setEdgeBits(ref.tnode(l).mykey, ref.tnode(i).mykey);
         }
     }
 

@@ -10,13 +10,14 @@
 // sou (somos) o(s) responsável (éis) por todas as eventuais cópias deste programa e que não distribui (mos) nem facilitei (amos) a distribuição de cópias.
 package RegAlloc;
 
-import Assem.AssemFlowGraph;
 import Graph.Graph;
 import Graph.Node;
 import Graph.NodeList;
+import Temp.Temp;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Stack;
 
 abstract public class InterferenceGraph extends Graph {
@@ -41,6 +42,8 @@ abstract public class InterferenceGraph extends Graph {
     protected LinkedList<MoveList> moveList;
     protected Integer[] degree;
     protected Integer[] color;
+    protected Map<Node, Temp> tableNodeTemp;
+    protected Map<Temp, Node> tableTempNode;
 
     InterferenceGraph() {
         this.coalescedMoves = new LinkedList<MovePair>(); // MovePair has src and dst
@@ -61,6 +64,8 @@ abstract public class InterferenceGraph extends Graph {
         this.coloredNodes = new LinkedList<Node>();
         this.moveList = new LinkedList<MoveList>();
         this.adjList = new LinkedList<NodeList>();
+        this.tableNodeTemp = new HashMap<Node, Temp>();
+        this.tableTempNode = new HashMap<Temp, Node>();
     }
 
     public void initInterferenceMatrix() {  // init bit matrix after all nodes been created
@@ -71,9 +76,14 @@ abstract public class InterferenceGraph extends Graph {
         return this.interferenceMatrix[x][y].equals(1) && this.interferenceMatrix[y][x].equals(1);
     }
 
-    public abstract Node tnode(Temp.Temp temp);
+    public void setEdgeBits(int x, int y) {
+        this.interferenceMatrix[x][y] = 1;
+        this.interferenceMatrix[y][x] = 1;
+    }
 
-    public abstract Temp.Temp gtemp(Node node);
+    public abstract Node tnode(Temp temp);
+
+    public abstract Temp gtemp(Node node);
 
     public abstract MoveList moves();
 
@@ -85,12 +95,11 @@ abstract public class InterferenceGraph extends Graph {
         return adjList.get(n).tail;
     }
 
-    public void initAdjList(AssemFlowGraph flowGraph) {
-        for(NodeList p = flowGraph.nodes(); p!=null; p=p.tail) {
+    public void initAdjList(InterferenceGraph ig) {
+        for(NodeList p = ig.nodes(); p!=null; p=p.tail) {
             Node n = p.head;
             NodeList list = new NodeList(n, n.adj());
             adjList.add(list);
         }
     }
-
 }

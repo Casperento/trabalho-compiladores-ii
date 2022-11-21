@@ -14,16 +14,6 @@ public class AssemFlowGraph extends FlowGraph {
 
     Map<Node, Instr> tableNodeInstr = new HashMap<Node, Instr>();
     Map<Instr, Node> tableInstrNode = new HashMap<Instr, Node>();
-    Map<Node, Temp[]> tableNodeTemp = new HashMap<Node, Temp[]>();
-    Map<Temp[], Node> tableTempNode = new HashMap<Temp[], Node>();
-
-    public Map<Node, Temp[]> getTableNodeTemp() {
-        return tableNodeTemp;
-    }
-
-    public Map<Temp[], Node> getTableTempNode() {
-        return tableTempNode;
-    }
 
     public Instr instr(Node n) {
         return (Instr) tableNodeInstr.get(n);
@@ -38,17 +28,6 @@ public class AssemFlowGraph extends FlowGraph {
             node = this.newNode();
             tableNodeInstr.put(node, instr);
             tableInstrNode.put(instr, node);
-
-            if (instr.def == null || instr.use == null)
-                continue;
-
-            Temp[] temps = new Temp[instr.def.length + instr.use.length];
-            for (int t = 0; t < instr.def.length; t++)
-                temps[t] = instr.def[t];
-            for (int t = instr.def.length; t < instr.use.length; t++)
-                temps[t] = instr.use[t];
-            tableNodeTemp.put(node, temps);
-            tableTempNode.put(temps, node);
         }
         for (NodeList nodes = this.nodes(); nodes != null; nodes = nodes.tail) {
             node = nodes.head;

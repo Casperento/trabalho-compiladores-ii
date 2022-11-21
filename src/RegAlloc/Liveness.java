@@ -11,13 +11,15 @@ import java.util.Map;
 
 public class Liveness extends InterferenceGraph {
     private Map<Integer, HashSet<Temp>> liveMap;
-    Map<Integer, HashSet<Temp>> use = new HashMap<Integer, HashSet<Temp>>();
-    Map<Integer, HashSet<Temp>> def = new HashMap<Integer, HashSet<Temp>>();
-    public AssemFlowGraph flowgraph;
+    private Map<Integer, HashSet<Temp>> use;
+    private Map<Integer, HashSet<Temp>> def;
+    protected AssemFlowGraph flowgraph;
     public Liveness(AssemFlowGraph flow) {
         flowgraph = flow;
         int totalNodes = Node.len(flow.nodes());
 
+        this.use = new HashMap<Integer, HashSet<Temp>>();
+        this.def = new HashMap<Integer, HashSet<Temp>>();
         Map<Integer, NodeList> succ = new HashMap<Integer, NodeList>();
         Map<Integer, HashSet<Temp>> in = new HashMap<Integer, HashSet<Temp>>();
         Map<Integer, HashSet<Temp>> inl = new HashMap<Integer, HashSet<Temp>>();
@@ -95,6 +97,23 @@ public class Liveness extends InterferenceGraph {
             }
         }
         liveMap = out;
+
+        // Creating nodes for each temp available at each basic block
+        Node nd;
+        HashSet<Temp> tmp, checked = new HashSet<Temp>();
+        for (int i = 0; i < totalNodes; i++) {
+            tmp = use.get(i);
+            tmp.addAll(def.get(i));
+            for (Temp tp : tmp) {
+                if (!checked.contains(tp)) {
+                    nd = this.newNode();
+                    tableNodeTemp.put(nd, tp);
+                    tableTempNode.put(tp, nd);
+                    checked.add(tp);
+                }
+            }
+        }
+        System.out.println();
     }
 
     public HashSet<Temp> liveOut(int n) {
@@ -103,18 +122,12 @@ public class Liveness extends InterferenceGraph {
 
     @Override
     public Node tnode(Temp temp) {
-        for (Temp[] tv: flowgraph.getTableTempNode().keySet()) {
-            for (Temp value : tv)
-                if (value == temp)
-                    return flowgraph.getTableTempNode().get(tv);
-        }
-        return null;
+        return tableTempNode.get(temp);
     }
 
     @Override
     public Temp gtemp(Node node) {
-        Temp[] tv = flowgraph.getTableNodeTemp().get(node);
-        return tv[0];
+        return tableNodeTemp.get(node);
     }
 
     @Override

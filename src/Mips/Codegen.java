@@ -16,8 +16,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.LinkedList;
 import java.util.Iterator;
-import java.util.Arrays;
+
 import Assem.Instr;
+import Tree.Exp1;
 import Tree.ExpList;
 
 public class Codegen implements Tree.CodeVisitor {
@@ -173,7 +174,7 @@ public class Codegen implements Tree.CodeVisitor {
         emit(MOVE("move `d0, `s0", dst, s.src.accept(this)));
     }
 
-    public void visit(Tree.EXP s) {
+    public void visit(Exp1 s) {
         s.exp.accept(this);
     }
 

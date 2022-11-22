@@ -11,6 +11,7 @@
 package Canon;
 
 import Tree.CodeVisitor;
+import Tree.Exp1;
 import Tree.IntVisitor;
 import Tree.ResultVisitor;
 
@@ -53,7 +54,7 @@ class ExpCall extends Tree.Stm {
         return call.kids();
     }
     public Tree.Stm build(Tree.ExpList kids) {
-        return new Tree.EXP(call.build(kids));
+        return new Exp1(call.build(kids));
     }
 
     @Override
@@ -84,8 +85,8 @@ class StmExpList {
 public class Canon {
 
     static boolean isNop(Tree.Stm a) {
-        return a instanceof Tree.EXP
-               && ((Tree.EXP)a).exp instanceof Tree.CONST;
+        return a instanceof Exp1
+               && ((Exp1)a).exp instanceof Tree.CONST;
     }
 
     static Tree.Stm seq(Tree.Stm a, Tree.Stm b) {
@@ -116,7 +117,7 @@ public class Canon {
         else return reorder_stm(s);
     }
 
-    static Tree.Stm do_stm(Tree.EXP s) {
+    static Tree.Stm do_stm(Exp1 s) {
         if (s.exp instanceof Tree.CALL)
             return reorder_stm(new ExpCall((Tree.CALL)s.exp));
         else return reorder_stm(s);
@@ -125,7 +126,7 @@ public class Canon {
     static Tree.Stm do_stm(Tree.Stm s) {
         if (s instanceof Tree.SEQ) return do_stm((Tree.SEQ)s);
         else if (s instanceof Tree.MOVE) return do_stm((Tree.MOVE)s);
-        else if (s instanceof Tree.EXP) return do_stm((Tree.EXP)s);
+        else if (s instanceof Exp1) return do_stm((Exp1)s);
         else return reorder_stm(s);
     }
 
@@ -150,7 +151,7 @@ public class Canon {
         return new Tree.ESEQ(x.stm, e.build(x.exps));
     }
 
-    static StmExpList nopNull = new StmExpList(new Tree.EXP(new Tree.CONST(0)),null);
+    static StmExpList nopNull = new StmExpList(new Exp1(new Tree.CONST(0)),null);
 
     static StmExpList reorder(Tree.ExpList exps) {
         if (exps==null) return nopNull;

@@ -9,7 +9,6 @@
 // pelo professor ou copiadas das bibliotecas ou do livro Modern Compiler Implementation, foram desenvolvidas por mim. Declaro também que
 // sou (somos) o(s) responsável (éis) por todas as eventuais cópias deste programa e que não distribui (mos) nem facilitei (amos) a distribuição de cópias.
 package Tree;
-import Temp.Temp;
 
 public interface ResultVisitor<R> {
     public R visit(SEQ n);
@@ -17,7 +16,7 @@ public interface ResultVisitor<R> {
     public R visit(JUMP n);
     public R visit(CJUMP n);
     public R visit(MOVE n);
-    public R visit(EXP n);
+    public R visit(Exp1 n);
     public R visit(BINOP n);
     public R visit(MEM n);
     public R visit(TEMP n);

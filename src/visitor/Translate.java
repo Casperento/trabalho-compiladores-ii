@@ -19,6 +19,7 @@ import Temp.Label;
 import Temp.Offset;
 import Temp.SimpleExp;
 import Temp.Temp;
+import Tree.Exp1;
 import Tree.ExpList;
 import gj.util.Enumeration;
 import syntaxtree.*;
@@ -1118,7 +1119,7 @@ public class Translate extends GJDepthFirst<Exp,MJType> {
         return new Tree.MOVE(dst, src);
     }
     private static Tree.Stm EXP(Tree.Exp exp) {
-        return new Tree.EXP(exp);
+        return new Exp1(exp);
     }
     private static Tree.Stm JUMP(Label target) {
         return new Tree.JUMP(target);

@@ -130,7 +130,7 @@ public class Print implements IntVisitor {
         s.src.accept(this, d+1);
         say(")");
     }
-    public void visit(EXP s, int d) {
+    public void visit(Exp1 s, int d) {
         indent(d);
         sayln("EXP(");
         s.exp.accept(this, d+1);

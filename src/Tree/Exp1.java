@@ -10,9 +10,9 @@
 // sou (somos) o(s) responsável (éis) por todas as eventuais cópias deste programa e que não distribui (mos) nem facilitei (amos) a distribuição de cópias.
 package Tree;
 
-public class EXP extends Stm {
+public class Exp1 extends Stm {
     public Exp exp;
-    public EXP(Exp e) {
+    public Exp1(Exp e) {
         exp=e;
     }
     public ExpList kids() {
@@ -20,7 +20,7 @@ public class EXP extends Stm {
     }
 
     public Stm build(ExpList kids) {
-        return new EXP(kids.head);
+        return new Exp1(kids.head);
     }
     public void accept(IntVisitor v, int d) {
         v.visit(this, d);

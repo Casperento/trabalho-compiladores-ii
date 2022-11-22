@@ -11,6 +11,7 @@
 //package Translate;
 package visitor;
 import Temp.Label;
+import Tree.Exp1;
 
 public class Ex extends Exp {
     Tree.Exp exp;
@@ -21,7 +22,7 @@ public class Ex extends Exp {
         return exp;
     }
     Tree.Stm unNx() {
-        return new Tree.EXP(exp);
+        return new Exp1(exp);
     }
     Tree.Stm unCx(Label t, Label f) {
         // if the exp is a constant, emit JUMP statement.

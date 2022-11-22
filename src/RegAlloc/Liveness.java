@@ -113,7 +113,6 @@ public class Liveness extends InterferenceGraph {
                 }
             }
         }
-        System.out.println();
     }
 
     public HashSet<Temp> liveOut(int n) {

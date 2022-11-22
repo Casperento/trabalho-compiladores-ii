@@ -81,9 +81,9 @@ public class Color implements TempMap {
             }
             live.addAll(ref.flowgraph.def(p.head).toSet());
             for (Temp i: ref.flowgraph.def(p.head).toSet()) {
-                for (Temp l: live) {
-                    addEdge(l, i, ref);
-                }
+                for (Temp l: live)
+                    if (l != null && i != null)
+                        addEdge(l, i, ref);
             }
             live.removeAll(ref.flowgraph.def(p.head).toSet());
             live.addAll(ref.flowgraph.use(p.head).toSet());
@@ -171,12 +171,16 @@ public class Color implements TempMap {
             ref.adjSet.add(aux);
             ref.adjSet.add(aux2);
             if (!ref.preColored.contains(ref.tnode(l))) {
-                ref.adjList.get(ref.tnode(l).mykey).tail = new NodeList(ref.tnode(i), ref.adjList.get(ref.tnode(l).mykey).tail);
-                ref.degree[ref.tnode(l).mykey] += 1;
+                if (!Node.inList(ref.tnode(i), ref.adjList.get(ref.tnode(l).mykey))) {
+                    ref.adjList.get(ref.tnode(l).mykey).tail = new NodeList(ref.tnode(i), ref.adjList.get(ref.tnode(l).mykey).tail);
+                    ref.degree[ref.tnode(l).mykey] += 1;
+                }
             }
             if (!ref.preColored.contains(ref.tnode(i))) {
-                ref.adjList.get(ref.tnode(i).mykey).tail = new NodeList(ref.tnode(l), ref.adjList.get(ref.tnode(i).mykey).tail);
-                ref.degree[ref.tnode(i).mykey] += 1;
+                if (!Node.inList(ref.tnode(l), ref.adjList.get(ref.tnode(i).mykey))) {
+                    ref.adjList.get(ref.tnode(i).mykey).tail = new NodeList(ref.tnode(l), ref.adjList.get(ref.tnode(i).mykey).tail);
+                    ref.degree[ref.tnode(i).mykey] += 1;
+                }
             }
             // Set corresponding bits on the interference matrix
             ref.setEdgeBits(ref.tnode(l).mykey, ref.tnode(i).mykey);
@@ -262,6 +266,7 @@ public class Color implements TempMap {
             return n;
         }
     }
+
     boolean moveRelated(InterferenceGraph ig, Node m) {
         return (MoveList.len(nodeMoves(ig, m)) != 0);
     }

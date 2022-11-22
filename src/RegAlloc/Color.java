@@ -29,25 +29,25 @@ public class Color implements TempMap {
         while (until_eval) {
             if (!ig.simplifyWorklist.isEmpty()) {
                 simplify(ig);
-            } else if (!ig.worklistMoves.isEmpty()) {
+            } /*else if (!ig.worklistMoves.isEmpty()) {
                 // TODO: coalesce
             } else if (!ig.freezeWorklist.isEmpty()) {
                 // TODO: freeze
             } else if (!ig.spillWorklist.isEmpty()) {
                 // TODO: selectSpill
-            }
-            until_eval = !ig.simplifyWorklist.isEmpty() ||
+            }*/
+            until_eval = !ig.simplifyWorklist.isEmpty() /* ||
                          !ig.worklistMoves.isEmpty() ||
                          !ig.freezeWorklist.isEmpty() ||
-                         !ig.spillWorklist.isEmpty();
+                         !ig.spillWorklist.isEmpty()*/;
         }
 
         assignCollors(ig);
 
-        if (!ig.spilledNodes.isEmpty()) {
-            // TODO: rewriteProgram
-            new Color(ig, initial, registers);
-        }
+//        if (!ig.spilledNodes.isEmpty()) {
+//            // TODO: rewriteProgram
+//            new Color(ig, initial, registers);
+//        }
 
     }
 
@@ -104,9 +104,9 @@ public class Color implements TempMap {
                     continue;
 
                 if (ref.degree[ref.tnode(i).mykey] >= K) {
-                    ref.spillWorklist.add(ref.tnode(i));
+//                    ref.spillWorklist.add(ref.tnode(i));
                 } else if (moveRelated(ig, ref.tnode(i))) {
-                    ref.freezeWorklist.add(ref.tnode(i));
+//                    ref.freezeWorklist.add(ref.tnode(i));
                 } else {
                     ref.simplifyWorklist.add(ref.tnode(i));
                 }
@@ -119,10 +119,10 @@ public class Color implements TempMap {
         List<Integer> okColors = new ArrayList<>();
         Integer c = 0;
 
-        Dictionary regIndce = new Hashtable();
-        for (int i = 0; i < K; i++) {
-            regIndce.put(i, ref.initial.get(i));
-        }
+//        Dictionary regIndce = new Hashtable();
+//        for (int i = 0; i < K; i++) {
+//            regIndce.put(i, ref.initial.get(i));
+//        }
 
         while (!ref.selectStack.empty()) {
             Node n = ref.selectStack.pop();
@@ -188,16 +188,8 @@ public class Color implements TempMap {
     }
 
     void simplify(InterferenceGraph ig) {
-        Node node = null;
-        for (int i = 0; i < ig.simplifyWorklist.size(); i++) {
-            if (ig.simplifyWorklist.get(i).degree() < K) {
-                node = ig.simplifyWorklist.get(i);
-                break;
-            }
-        }
-
+        Node node = ig.simplifyWorklist.remove(0);
         if (node != null) {
-            ig.simplifyWorklist.removeFirstOccurrence(node);
             ig.selectStack.push(node);
             adjacent(ig, node);
             for (NodeList m = ig.adjList.get(node.mykey); m != null; m = m.tail)
@@ -223,15 +215,22 @@ public class Color implements TempMap {
     }
 
     void decrementDegree(InterferenceGraph ig, Node m) {
-        int d = ig.degree[m.mykey];
-        if (d == K) {
-            adjacent(ig, m);
-            enableMoves(ig, ig.adjList.get(m.mykey));
-            if (ig.spillWorklist.remove(m)) {
-                if (moveRelated(ig, m)) {
-                    ig.freezeWorklist.add(m);
-                } else {
-                    ig.simplifyWorklist.add(m);
+        if (m != null) {
+            ig.degree[m.mykey] -= 1;
+            if (ig.degree[m.mykey] == K) {
+                adjacent(ig, m);
+
+                NodeList union = ig.adjList.get(m.mykey);
+                if (!Node.inList(m, union))
+                    union = new NodeList(m, union);
+
+                enableMoves(ig, union);
+                if (ig.spillWorklist.remove(m)) {
+                    if (moveRelated(ig, m)) {
+                        ig.freezeWorklist.add(m);
+                    } else {
+                        ig.simplifyWorklist.add(m);
+                    }
                 }
             }
         }
@@ -272,21 +271,26 @@ public class Color implements TempMap {
     }
 
     MoveList nodeMoves(InterferenceGraph ig, Node n) {
-        LinkedList<MovePair> union = new LinkedList<MovePair>(ig.activeMoves);
-        for (MovePair w: ig.worklistMoves)
-            if (!union.contains(w))
-                union.add(w);
+        if (n != null) {
+            LinkedList<MovePair> union = new LinkedList<MovePair>(ig.activeMoves);
+            for (MovePair w: ig.worklistMoves)
+                if (!union.contains(w))
+                    union.add(w);
 
-        MoveList intersect = new MoveList(null, null, null);
-        Node s, d;
-        for (MoveList mv = ig.moveList.get(n.mykey); mv != null; mv = mv.tail) {
-            s = mv.src;
-            d = mv.dst;
-            for (MovePair m: union)
-                if (s.mykey == m.getSource().mykey && d.mykey == m.getDest().mykey)
-                    intersect = new MoveList(s, d, intersect);
+            MoveList intersect = new MoveList(null, null, null);
+            Node s, d;
+            for (MoveList mv = ig.moveList.get(n.mykey); mv != null; mv = mv.tail) {
+                s = mv.src;
+                d = mv.dst;
+                if (s != null || d != null) {
+                    for (MovePair m: union)
+                        if (s.mykey == m.getSource().mykey && d.mykey == m.getDest().mykey)
+                            intersect = new MoveList(s, d, intersect);
+                }
+            }
+
+            return intersect;
         }
-
-        return intersect;
+        return new MoveList(null, null, null);
     }
 }

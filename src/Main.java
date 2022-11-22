@@ -23,8 +23,6 @@ import visitor.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.io.PrintStream;
-import java.io.FileOutputStream;
 
 public class Main {
     static PrintWriter debug = new PrintWriter(System.out);
@@ -99,16 +97,18 @@ public class Main {
                 inputFile = dirList[i];
                 try {
                     stream = new FileInputStream(inputFile);
-
                     try {
-                        root = (new MiniJavaParser(stream)).Goal();
-                    } catch (ParseException e) {
-                        System.err.println("Parse exception: " + e);
+                        if (root == null)
+                            new MiniJavaParser(stream);
+                        else
+                            MiniJavaParser.ReInit(stream);
+                        root = MiniJavaParser.Goal();
+                    } catch (Error | ParseException e) {
+                        System.err.println("Catched exception when trying to parse " + inputFile + " source code: " + e);
+                        continue;
                     }
 
                     my_classes = new MJClasses();
-
-                    assert root != null;
                     root.accept(new GJFillTable(), my_classes);
 
                     translate = new Translate(frame);
@@ -125,15 +125,15 @@ public class Main {
                             out.print(((DataFrag) f).data);
                         }
                     }
-
+                    oStream.close();
                     out.close();
-                    debug.close();
-
+                    stream.close();
                 } catch (FileNotFoundException e) {
                     System.err.println("File not found exception: " + e);
                 }
             }
         }
+        debug.close();
 
     }
 }

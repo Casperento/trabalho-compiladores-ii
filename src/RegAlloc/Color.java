@@ -2,12 +2,14 @@ package RegAlloc;
 
 import Graph.Node;
 import Graph.NodeList;
-import Mips.MipsFrame;
 import Temp.Temp;
 import Temp.TempList;
 import Temp.TempMap;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Color implements TempMap {
 
@@ -21,8 +23,21 @@ public class Color implements TempMap {
         return null;
     }
 
-    public Color(InterferenceGraph ig, MipsFrame initial, TempList registers) {
-        build(ig);
+    public Color(InterferenceGraph ig, HashSet<Temp> initial, TempList registers) {
+        // Adding precolored nodes to graph
+        Node nd;
+        Temp tp;
+        for (TempList l = registers; l != null; l = l.tail) {
+            tp = l.head;
+            nd = ig.tnode(tp);
+            if (tp != null && nd == null) {
+                nd = ig.newNode();
+                ig.tableNodeTemp.put(nd, tp);
+                ig.tableTempNode.put(tp, nd);
+            }
+        }
+
+        build(ig, registers);
         makeWorkLists(initial, ig);
 
         boolean until_eval = true;
@@ -51,17 +66,39 @@ public class Color implements TempMap {
 
     }
 
-    private void build(InterferenceGraph ig) {
+    private void build(InterferenceGraph ig, TempList registers) {
         Liveness ref = (Liveness) ig;
         NodeList n = ref.flowgraph.nodes();
+        Node t = null;
         int totalNodes = Node.len(ref.nodes());
 
         ref.degree = new Integer[totalNodes];
         ref.color = new Integer[totalNodes];
         for (int i = 0; i < totalNodes; i++) {
             ref.moveList.add(new MoveList(null, null, null));
-            ref.degree[i] = 0;
-            ref.color[i] = 0;
+
+            for (NodeList p = ref.nodes(); p != null; p = p.tail){
+                if (p.head.mykey == i) {
+                    t = p.head;
+                    break;
+                }
+            }
+
+            // Setting degree and color up
+            if (t != null && !TempList.inList(ref.gtemp(t), registers)) {
+                ref.degree[i] = 0;
+                ref.color[i] = 0;
+            } else {
+                ref.degree[i] = totalNodes + K;
+                ref.color[i] = i;
+            }
+
+            // Setting preColored up
+            if (TempList.inList(ref.gtemp(t), registers)) {
+                ref.preColored.add(t);
+            }
+
+            t = null;
         }
 
         ref.initAdjList(ig);
@@ -90,16 +127,14 @@ public class Color implements TempMap {
         }
     }
 
-    private void makeWorkLists(MipsFrame initial, InterferenceGraph ig) {
+    private void makeWorkLists(HashSet<Temp> initial, InterferenceGraph ig) {
         Liveness ref = (Liveness) ig;
-
-        LinkedList<Temp> initialCopy = new LinkedList<Temp>(initial.getInitial());
-        LinkedList<Temp> tmp;
+        HashSet<Temp> initialCopy = new HashSet<Temp>(initial);
         for (Temp i: initialCopy) {
-            tmp = initial.getInitial();
-            if (tmp.remove(i)) {
-                initial.setInitial(tmp);
+            if (i == null)
+                continue;
 
+            if (initial.remove(i)) {
                 if (ref.tnode(i) == null)
                     continue;
 

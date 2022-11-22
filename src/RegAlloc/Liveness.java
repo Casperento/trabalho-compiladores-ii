@@ -11,15 +11,14 @@ import java.util.Map;
 
 public class Liveness extends InterferenceGraph {
     private Map<Integer, HashSet<Temp>> liveMap;
-    private Map<Integer, HashSet<Temp>> use;
-    private Map<Integer, HashSet<Temp>> def;
     protected AssemFlowGraph flowgraph;
+    protected HashSet<Temp> initial;
     public Liveness(AssemFlowGraph flow) {
         flowgraph = flow;
         int totalNodes = Node.len(flow.nodes());
 
-        this.use = new HashMap<Integer, HashSet<Temp>>();
-        this.def = new HashMap<Integer, HashSet<Temp>>();
+        Map<Integer, HashSet<Temp>> use = new HashMap<Integer, HashSet<Temp>>();
+        Map<Integer, HashSet<Temp>> def = new HashMap<Integer, HashSet<Temp>>();
         Map<Integer, NodeList> succ = new HashMap<Integer, NodeList>();
         Map<Integer, HashSet<Temp>> in = new HashMap<Integer, HashSet<Temp>>();
         Map<Integer, HashSet<Temp>> inl = new HashMap<Integer, HashSet<Temp>>();
@@ -100,16 +99,17 @@ public class Liveness extends InterferenceGraph {
 
         // Creating nodes for each temp available at each basic block
         Node nd;
-        HashSet<Temp> tmp, checked = new HashSet<Temp>();
+        HashSet<Temp> tmp;
+        initial = new HashSet<Temp>();
         for (int i = 0; i < totalNodes; i++) {
-            tmp = use.get(i);
-            tmp.addAll(def.get(i));
+            tmp = out.get(i);
+            tmp.addAll(in.get(i));
             for (Temp tp : tmp) {
-                if (!checked.contains(tp)) {
+                if (!initial.contains(tp)) {
                     nd = this.newNode();
                     tableNodeTemp.put(nd, tp);
                     tableTempNode.put(tp, nd);
-                    checked.add(tp);
+                    initial.add(tp);
                 }
             }
         }
@@ -132,14 +132,14 @@ public class Liveness extends InterferenceGraph {
     @Override
     public MoveList moves() {
         MoveList mvList = new MoveList(null, null, null);
-        Temp s, d;
-        for (NodeList node = flowgraph.nodes(); node != null; node = node.tail) {
-            if (flowgraph.isMove(node.head)) {
-                s = (Temp) this.use.get(node.head.mykey).toArray()[0];
-                d = (Temp) this.def.get(node.head.mykey).toArray()[0];
-                mvList = new MoveList(this.tnode(s), this.tnode(d), mvList);
-            }
-        }
+//        Temp s, d;
+//        for (NodeList node = flowgraph.nodes(); node != null; node = node.tail) {
+//            if (flowgraph.isMove(node.head)) {
+//                s = (Temp) this.use.get(node.head.mykey).toArray()[0];
+//                d = (Temp) this.def.get(node.head.mykey).toArray()[0];
+//                mvList = new MoveList(this.tnode(s), this.tnode(d), mvList);
+//            }
+//        }
         return mvList;
     }
 }

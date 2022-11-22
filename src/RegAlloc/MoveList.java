@@ -20,6 +20,9 @@ public class MoveList {
     }
 
     public static int len(MoveList l) {
+        if (l != null && (l.src == null || l.dst == null))
+            return 0;
+
         int i=0;
         for(MoveList p=l; p!=null; p=p.tail) i++;
         return i;

@@ -20,12 +20,11 @@ import types.MJClasses;
 import types.MJType;
 import visitor.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.io.PrintStream;
+import java.io.FileOutputStream;
 
 public class Main {
     static PrintWriter debug = new PrintWriter(System.out);
@@ -85,49 +84,56 @@ public class Main {
     }
 
     public static void main(String [] args) throws java.io.IOException {
-        Node root;
-        try {
-            File inputFile = new File("tests/Factorial.java");
-            InputStream stream = new FileInputStream(inputFile);
-            root = (new MiniJavaParser(stream)).Goal();
-        } catch (ParseException e) {
-            System.err.println (e.toString() );
-            return;
-        }
+        Node root = null;
+        InputStream stream;
+        MJType my_classes;
+        Translate translate;
+        PrintStream out;
+        Frag f;
+        FileOutputStream oStream;
+        String newName;
+        File dir = new File("tests/"), inputFile;
+        File[] dirList = dir.listFiles();
+        if (dirList != null) {
+            for (int i = dirList.length-1; i >= 0; i--) {
+                inputFile = dirList[i];
+                try {
+                    stream = new FileInputStream(inputFile);
 
-        //build a symbol table
-        MJType my_classes = new MJClasses();
-        root.accept(new GJFillTable(),my_classes);
+                    try {
+                        root = (new MiniJavaParser(stream)).Goal();
+                    } catch (ParseException e) {
+                        System.err.println("Parse exception: " + e);
+                    }
 
+                    my_classes = new MJClasses();
 
-        //this visitor is used to translate to IR
-//        Translate translate=new Translate(new Mips.MipsFrame());
-        Translate translate=new Translate(frame);
-        root.accept(translate, my_classes);
+                    assert root != null;
+                    root.accept(new GJFillTable(), my_classes);
 
-        //the translate visitor has a getResults method which returns
-        //an iterator of fragments. The following code illustrates how to
-        //iterate through the fragments. I am printing out the IR Tree to
-        //stdout here, but one could as well implement a backend to compile
-        //the IR to assembly at this point.
+                    translate = new Translate(frame);
+                    root.accept(translate, my_classes);
 
-        java.io.PrintStream out = new java.io.PrintStream(new java.io.FileOutputStream("foo.s"));
-        for (Iterator<visitor.Frag> frags = translate.getResults(); frags.hasNext(); ) {
+                    newName = "foo_" + inputFile.getName() + ".s";
+                    oStream = new FileOutputStream(newName);
+                    out = new PrintStream(oStream);
+                    for (Iterator<Frag> frags = translate.getResults(); frags.hasNext(); ) {
+                        f = frags.next();
+                        if (f instanceof ProcFrag) {
+                            emitProc(out, (ProcFrag) f);
+                        } else if  (f instanceof DataFrag) {
+                            out.print(((DataFrag) f).data);
+                        }
+                    }
 
-            //get next fragment
-            Frag f = frags.next();
+                    out.close();
+                    debug.close();
 
-            //if the fragment is a ProcFrag i.e one which contains a procedure
-            //then I get the map of temps associated with it and print it out.
-
-            if (f instanceof ProcFrag) {
-                emitProc(out, (ProcFrag) f);
-            } else if  (f instanceof DataFrag) {
-                out.print(((DataFrag) f).data);
+                } catch (FileNotFoundException e) {
+                    System.err.println("File not found exception: " + e);
+                }
             }
         }
 
-        out.close();
-        debug.close();
     }
 }

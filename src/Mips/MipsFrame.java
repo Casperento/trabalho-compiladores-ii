@@ -174,10 +174,6 @@ public class MipsFrame extends Frame {
         return initial;
     }
 
-    public void setInitial(LinkedList<Temp> initial) {
-        this.initial = initial;
-    }
-
     private LinkedList<Temp> initial = new LinkedList<Temp>();
 
     {

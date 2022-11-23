@@ -3,17 +3,21 @@ package RegAlloc;
 import Assem.AssemFlowGraph;
 import Graph.Node;
 import Graph.NodeList;
+import Mips.MipsFrame;
 import Temp.Temp;
 
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Map;
 
 public class Liveness extends InterferenceGraph {
     private Map<Integer, HashSet<Temp>> liveMap;
     protected AssemFlowGraph flowgraph;
+    private final int K = 15;
     protected HashSet<Temp> initial;
-    public Liveness(AssemFlowGraph flow) {
+    public Liveness(AssemFlowGraph flow, MipsFrame f) {
         flowgraph = flow;
         int totalNodes = Node.len(flow.nodes());
 
@@ -112,6 +116,10 @@ public class Liveness extends InterferenceGraph {
                     initial.add(tp);
                 }
             }
+        }
+
+        for (int i = 0; i < K; i++) {
+            this.colorMap.put(i, f.getInitial().get(i));
         }
     }
 

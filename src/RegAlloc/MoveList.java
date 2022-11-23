@@ -20,7 +20,7 @@ public class MoveList {
     }
 
     public static int len(MoveList l) {
-        if (l != null && (l.src == null || l.dst == null))
+        if (l == null || l.src == null || l.dst == null)
             return 0;
 
         int i=0;

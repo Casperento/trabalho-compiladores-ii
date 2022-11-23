@@ -75,8 +75,8 @@ public class Main {
 
         debug.println("# Instructions: ");
         for(Assem.InstrList p=instrs; p!=null; p=p.tail) {
-            debug.print(p.head.format(tempmap) + '\n');
-            out.print(p.head.format(tempmap) + '\n');
+            debug.print(p.head.format(allocator) + '\n');
+            out.print(p.head.format(allocator) + '\n');
         }
 
     }

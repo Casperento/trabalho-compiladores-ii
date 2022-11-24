@@ -41,8 +41,8 @@ public class Node {
     }
 
     public static int len(NodeList l) {
-        int i=0;
-        for(NodeList p=l; p!=null; p=p.tail) i++;
+        int i = 0;
+        for (NodeList p = l; p != null; p = p.tail) i++;
         return i;
     }
 

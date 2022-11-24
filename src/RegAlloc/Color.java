@@ -7,13 +7,7 @@ import Temp.Temp;
 import Temp.TempList;
 import Temp.TempMap;
 
-import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Color implements TempMap {
 
@@ -59,8 +53,8 @@ public class Color implements TempMap {
                 // TODO: freeze
             } else if (!ig.spillWorklist.isEmpty()) {
                 // TODO: selectSpill
-            }*/
-            until_eval = !ig.simplifyWorklist.isEmpty() /* ||
+            } */
+            until_eval = !ig.simplifyWorklist.isEmpty() /*||
                          !ig.worklistMoves.isEmpty() ||
                          !ig.freezeWorklist.isEmpty() ||
                          !ig.spillWorklist.isEmpty()*/;
@@ -68,10 +62,10 @@ public class Color implements TempMap {
 
         assignCollors(ig);
 
-//        if (!ig.spilledNodes.isEmpty()) {
-//            // TODO: rewriteProgram
-//            new Color(ig, initial, registers);
-//        }
+        if (!ig.spilledNodes.isEmpty()) {
+            // TODO: rewriteProgram
+            // new Color(ig, initial, registers, f);
+        }
         Liveness ref = (Liveness) ig;
         for (Temp i: ref.initial) {
             if (!TempList.inList(i, registers)) {
@@ -79,8 +73,9 @@ public class Color implements TempMap {
             } else {
                 tableTempColor.put(i, i);
             }
-
         }
+
+        System.out.println();
     }
 
     private void build(InterferenceGraph ig, TempList registers) {
@@ -128,7 +123,6 @@ public class Color implements TempMap {
 
                 for (Temp i: defUse) {
                     if (ref.tnode(i) != null){
-//                      ref.moveList.get(ref.tnode(i).mykey).tail = new MoveList(p.head, p.head, ref.moveList.get(ref.tnode(i).mykey).tail);
                         ref.moveList.put(ref.tnode(i).mykey, new MoveList(ref.tnode(ref.flowgraph.use(p.head).head), ref.tnode(ref.flowgraph.def(p.head).head), ref.moveList.get(ref.tnode(i).mykey)));
                     }
                 }
@@ -156,15 +150,13 @@ public class Color implements TempMap {
                 if (ref.tnode(i) == null)
                     continue;
 
-                if (ref.degree[ref.tnode(i).mykey] >= K) {
-//                    ref.spillWorklist.add(ref.tnode(i));
-                    System.out.println();
+                /*if (ref.degree[ref.tnode(i).mykey] >= K) {
+                    ref.spillWorklist.add(ref.tnode(i));
                 } else if (moveRelated(ig, ref.tnode(i))) {
-//                    ref.freezeWorklist.add(ref.tnode(i));
-                    System.out.println();
-                } else {
-                    ref.simplifyWorklist.add(ref.tnode(i));
-                }
+                    ref.freezeWorklist.add(ref.tnode(i));
+                } else {*/
+                ref.simplifyWorklist.add(ref.tnode(i));
+//                }
             }
         }
     }
@@ -191,19 +183,19 @@ public class Color implements TempMap {
 //            if (okColors.size() == 0) {
 //                ref.spilledNodes.add(n);
 //            } else {
-            if (count == K) {
-                count = 0;
-            }
-            ref.coloredNodes.add(n);
-            c = okColors.get(count);
-            ref.color[n.mykey] = c;
-            count++;
+                if (count == K) {
+                    count = 0;
+                }
+                ref.coloredNodes.add(n);
+                c = okColors.get(count);
+                ref.color[n.mykey] = c;
+                count++;
 //            }
         }
 
-//        for (Node x: ref.coalescedNodes) {
-//            ref.color[x.mykey] = getAlias(ref, x).mykey;
-//        }
+        for (Node x: ref.coalescedNodes) {
+            ref.color[x.mykey] = getAlias(ref, x).mykey;
+        }
     }
 
     private void diff(HashSet<Temp> live, HashSet<Temp> useI) {
@@ -227,13 +219,23 @@ public class Color implements TempMap {
             ref.adjSet.add(aux2);
             if (!ref.preColored.contains(ref.tnode(l))) {
                 if (!Node.inList(ref.tnode(i), ref.adjList.get(ref.tnode(l).mykey))) {
-                    ref.adjList.get(ref.tnode(l).mykey).tail = new NodeList(ref.tnode(i), ref.adjList.get(ref.tnode(l).mykey).tail);
+                    if (ref.adjList.get(ref.tnode(l).mykey).head == null) {
+                        ref.adjList.add(ref.tnode(l).mykey, new NodeList(ref.tnode(i), ref.adjList.get(ref.tnode(l).mykey).tail));
+                    } else {
+                        ref.adjList.get(ref.tnode(l).mykey).tail = new NodeList(ref.tnode(i), ref.adjList.get(ref.tnode(l).mykey).tail);
+                    }
+
                     ref.degree[ref.tnode(l).mykey] += 1;
                 }
             }
             if (!ref.preColored.contains(ref.tnode(i))) {
                 if (!Node.inList(ref.tnode(l), ref.adjList.get(ref.tnode(i).mykey))) {
-                    ref.adjList.get(ref.tnode(i).mykey).tail = new NodeList(ref.tnode(l), ref.adjList.get(ref.tnode(i).mykey).tail);
+                    if (ref.adjList.get(ref.tnode(i).mykey).head == null) {
+                        ref.adjList.add(ref.tnode(i).mykey, new NodeList(ref.tnode(l), ref.adjList.get(ref.tnode(i).mykey).tail));
+                    } else {
+                        ref.adjList.get(ref.tnode(i).mykey).tail = new NodeList(ref.tnode(l), ref.adjList.get(ref.tnode(i).mykey).tail);
+                    }
+
                     ref.degree[ref.tnode(i).mykey] += 1;
                 }
             }
@@ -253,18 +255,20 @@ public class Color implements TempMap {
     }
 
     void adjacent(InterferenceGraph ig, Node n) {
-        NodeList adj = ig.adjList.get(n.mykey), union = new NodeList(null, null);
+        NodeList adj = new NodeList(null, null);
+        LinkedList<Node> coalesced = new LinkedList<Node>(ig.coalescedNodes);
 
-        for (Node c : ig.coalescedNodes)
-            union = new NodeList(c, union);
-
+        // selectStack | coalescedNodes
         for (Node node : ig.selectStack)
-            if (!Node.inList(node, union))
-                union = new NodeList(node, union);
+            if (!coalesced.contains(node))
+                coalesced.add(node);
 
-        for (NodeList u = union; u != null; u = u.tail)
-            if (!Node.inList(u.head, adj))
-                adj = new NodeList(u.head, adj);
+        // adjList[n] \ (selectStack | coalescedNodes)
+        for (NodeList l = ig.adjList.get(n.mykey); l != null; l = l.tail) {
+            if (!coalesced.contains(l.head)) {
+                adj = new NodeList(l.head, adj);
+            }
+        }
 
         ig.adjList.set(n.mykey, adj);
     }
@@ -348,4 +352,5 @@ public class Color implements TempMap {
         }
         return null;
     }
+
 }

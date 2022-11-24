@@ -10,10 +10,12 @@
 // sou (somos) o(s) responsável (éis) por todas as eventuais cópias deste programa e que não distribui (mos) nem facilitei (amos) a distribuição de cópias.
 
 import Assem.InstrList;
+import Assem.LABEL;
 import Mips.MipsFrame;
 import Parser.MiniJavaParser;
 import Parser.ParseException;
 import RegAlloc.RegAlloc;
+import Temp.Label;
 import Tree.Stm;
 import syntaxtree.Node;
 import types.MJClasses;
@@ -68,7 +70,15 @@ public class Main {
         Tree.StmList traced = (new Canon.TraceSchedule(b)).stms;
         prStmList(traced);
 
-        Assem.InstrList instrs= codegen(f.frame,traced);
+        Assem.InstrList instrs = codegen(f.frame,traced);
+        String frag_label = new String();
+
+        if (f.frame.name.toString().contains("main"))
+            frag_label = "main:";
+        else
+            frag_label = f.frame.name + ":";
+
+        instrs = new InstrList(new LABEL(frag_label, new Label()), instrs);
 
         // Register allocation by graph coloring
         RegAlloc allocator = new RegAlloc(f.frame, instrs);
@@ -117,6 +127,7 @@ public class Main {
                     newName = "foo_" + inputFile.getName() + ".s";
                     oStream = new FileOutputStream(newName);
                     out = new PrintStream(oStream);
+                    out.println("\t.data\n\t.text\n\t.globl main\n");
                     for (Iterator<Frag> frags = translate.getResults(); frags.hasNext(); ) {
                         f = frags.next();
                         if (f instanceof ProcFrag) {
@@ -134,6 +145,5 @@ public class Main {
             }
         }
         debug.close();
-
     }
 }

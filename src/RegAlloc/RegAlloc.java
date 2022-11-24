@@ -18,6 +18,6 @@ public class RegAlloc implements TempMap {
         instrs = il;
         AssemFlowGraph flowgraph = new AssemFlowGraph(instrs); // build flowgraph for liveness analysis
         Liveness liveness = new Liveness(flowgraph, (MipsFrame) f); // run liveness analysis (Liveness extends InterferenceGraph)
-        regalloc = new Color(liveness, liveness.initial, Temp.tempVecToList(f.registers()), (MipsFrame) f); // TODO: test and fix initial and registers params
+        regalloc = new Color(liveness, liveness.initial, Temp.tempVecToList(f.registers()), (MipsFrame) f);
     }
 }

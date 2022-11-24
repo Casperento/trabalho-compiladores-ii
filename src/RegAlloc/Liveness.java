@@ -6,10 +6,8 @@ import Graph.NodeList;
 import Mips.MipsFrame;
 import Temp.Temp;
 
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Map;
 
 public class Liveness extends InterferenceGraph {
@@ -106,8 +104,13 @@ public class Liveness extends InterferenceGraph {
         HashSet<Temp> tmp;
         initial = new HashSet<Temp>();
         for (int i = 0; i < totalNodes; i++) {
-            tmp = out.get(i);
-            tmp.addAll(in.get(i));
+            tmp = def.get(i);
+
+            if (tmp.size() == 17)
+                tmp = use.get(i);
+            else
+                tmp.addAll(use.get(i));
+
             for (Temp tp : tmp) {
                 if (!initial.contains(tp)) {
                     nd = this.newNode();
@@ -138,16 +141,7 @@ public class Liveness extends InterferenceGraph {
     }
 
     @Override
-    public MoveList moves() {
-        MoveList mvList = new MoveList(null, null, null);
-//        Temp s, d;
-//        for (NodeList node = flowgraph.nodes(); node != null; node = node.tail) {
-//            if (flowgraph.isMove(node.head)) {
-//                s = (Temp) this.use.get(node.head.mykey).toArray()[0];
-//                d = (Temp) this.def.get(node.head.mykey).toArray()[0];
-//                mvList = new MoveList(this.tnode(s), this.tnode(d), mvList);
-//            }
-//        }
-        return mvList;
+    public HashMap<Integer,MoveList> moves() {
+        return this.moveList;
     }
 }

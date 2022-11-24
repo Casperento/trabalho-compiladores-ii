@@ -16,7 +16,6 @@ import Graph.NodeList;
 import Temp.Temp;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Stack;
@@ -35,7 +34,6 @@ abstract public class InterferenceGraph extends Graph {
     protected LinkedList<Node> freezeWorklist;
     protected LinkedList<Node> spillWorklist;
     protected LinkedList<Node> preColored;
-    protected LinkedList<Node> initial;
     protected LinkedList<Node> spilledNodes;
     protected LinkedList<Node> coalescedNodes;
     protected LinkedList<Node> coloredNodes;
@@ -56,7 +54,6 @@ abstract public class InterferenceGraph extends Graph {
         this.alias = new HashMap<Integer, Integer>();
         this.adjSet = new LinkedList<EdgePair>(); // EdgePair has src and dst
         this.preColored = new LinkedList<Node>();
-        this.initial = new LinkedList<Node>();
         this.simplifyWorklist = new LinkedList<Node>();
         this.selectStack = new Stack<Node>();
         this.freezeWorklist = new LinkedList<Node>();
@@ -88,7 +85,7 @@ abstract public class InterferenceGraph extends Graph {
 
     public abstract Temp gtemp(Node node);
 
-    public abstract MoveList moves();
+    public abstract HashMap<Integer,MoveList> moves();
 
     public int spillCost(Node node) {
         return 1;
@@ -99,10 +96,7 @@ abstract public class InterferenceGraph extends Graph {
     }
 
     public void initAdjList(InterferenceGraph ig) {
-        for(NodeList p = ig.nodes(); p!=null; p=p.tail) {
-            Node n = p.head;
-            NodeList list = new NodeList(n, n.adj());
-            adjList.add(list);
-        }
+        for (NodeList p = ig.nodes(); p != null; p = p.tail)
+            adjList.add(new NodeList(null, null));
     }
 }
